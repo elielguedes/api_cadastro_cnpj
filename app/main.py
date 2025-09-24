@@ -15,3 +15,9 @@ app.include_router(auth_router, prefix="/auth", tags=["auth"])
 
 # Cria as tabelas no banco de dados SQLite usando SQLAlchemy
 Base.metadata.create_all(bind=engine)
+
+# Arquivos e pastas a serem ignorados pelo Git
+venv/
+__pycache__/
+*.db
+*.pyc
