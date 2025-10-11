@@ -64,3 +64,41 @@ erDiagram
 
 ## Licença
 MIT
+
+## Executando localmente (venv)
+
+Este projeto pode ser executado localmente com um ambiente virtual Python.
+
+1. Crie e ative o venv:
+
+```powershell
+python -m venv .\.venv
+.\.venv\Scripts\Activate.ps1
+```
+
+2. Instale dependências:
+
+```powershell
+pip install -r requirements.txt
+```
+
+3. Inicie a aplicação:
+
+```powershell
+uvicorn app.main:app --reload
+```
+
+Ou use o helper `start.ps1` que já configura o venv e roda o servidor:
+
+```powershell
+.\start.ps1
+# ou para habilitar o carregamento automático do CSV
+.\start.ps1 -AutoLoad
+```
+
+Se quiser rodar a aplicação apontando para um PostgreSQL externo, exporte a variável de ambiente `DATABASE_URL`:
+
+```powershell
+$env:DATABASE_URL = "postgresql+psycopg2://user:pass@host:5432/dbname"
+uvicorn app.main:app --reload
+```
