@@ -25,3 +25,10 @@ python-multipart==0.0.6
 
 # Driver Postgres para SQLAlchemy
 psycopg2-binary==2.9.10
+
+# Migrations
+alembic
+
+# Testing / http client
+pytest
+httpx==0.23.3

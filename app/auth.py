@@ -4,11 +4,12 @@ from passlib.context import CryptContext
 from jose import jwt, JWTError
 from app.models.models import Usuario as UsuarioModel
 from app.schemas import UsuarioCreate, Usuario
-from app.database import SessionLocal
+from app.deps import get_db
+import os
 from datetime import datetime, timedelta
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
-SECRET_KEY = "supersecretkey"
+SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-change-me")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -22,13 +23,6 @@ oauth2_scheme = OAuth2PasswordBearer(
 )
 
 router = APIRouter()
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
@@ -53,7 +47,7 @@ def register(user: UsuarioCreate, db: Session = Depends(get_db)):
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-    return Usuario.from_orm(new_user)
+    return {"id": new_user.id, "username": new_user.username, "is_admin": new_user.is_admin}
 
 @router.post("/login")
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
@@ -81,4 +75,4 @@ def read_users_me(token: str = Depends(oauth2_scheme), db: Session = Depends(get
     user = db.query(UsuarioModel).filter(UsuarioModel.username == username).first()
     if user is None:
         raise credentials_exception
-    return Usuario.from_orm(user)
+    return {"id": user.id, "username": user.username, "is_admin": user.is_admin}

@@ -5,8 +5,8 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from app.auth import SECRET_KEY, ALGORITHM
 from sqlalchemy.orm import Session
-from app.schemas import EmpresaCreate, Empresa
-from app.database import SessionLocal
+from app.schemas import EmpresaCreate, Empresa, EmpresaRead
+from app.deps import get_db, require_admin
 from app.services.empresa_service import (
     create_empresa_service,
     get_empresas_service,
@@ -16,20 +16,15 @@ from app.services.empresa_service import (
 
 router = APIRouter()
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
-@router.post("/", response_model=Empresa, operation_id="create_empresa")
-def create_empresa(empresa: EmpresaCreate, db: Session = Depends(get_db)):
+
+
+@router.post("/", response_model=EmpresaRead, operation_id="create_empresa")
+def create_empresa(empresa: EmpresaCreate, db: Session = Depends(get_db), _=Depends(require_admin)):
     return create_empresa_service(db, empresa)
 
-@router.get("/", response_model=list[Empresa], operation_id="read_empresas_list")
-
-@router.get("/", response_model=list[Empresa], operation_id="read_empresas")
+@router.get("/", response_model=list[EmpresaRead], operation_id="read_empresas")
 def read_empresas(
     skip: int = 0,
     limit: int = 10,
@@ -51,15 +46,14 @@ def read_empresas(
     empresas = query.offset(skip).limit(limit).all()
     return empresas
 
-@router.get("/{empresa_id}", response_model=Empresa, operation_id="read_empresa")
+@router.get("/{empresa_id}", response_model=EmpresaRead, operation_id="read_empresa")
 def read_empresa(empresa_id: int, db: Session = Depends(get_db)):
     empresa = get_empresa_service(db, empresa_id)
     if empresa is None:
         raise HTTPException(status_code=404, detail="Empresa not found")
     return empresa
 
-@router.delete("/{empresa_id}", operation_id="delete_empresa_check_user")
-def get_current_user(token: str = Depends(OAuth2PasswordBearer(tokenUrl="/auth/login")), db: Session = Depends(get_db)):
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Não autorizado",
@@ -79,10 +73,20 @@ def get_current_user(token: str = Depends(OAuth2PasswordBearer(tokenUrl="/auth/l
     return user
 
 @router.delete("/{empresa_id}", operation_id="delete_empresa")
-def delete_empresa(empresa_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
-    if not current_user.is_admin:
-        raise HTTPException(status_code=403, detail="Apenas admin pode deletar empresa.")
+def delete_empresa(empresa_id: int, db: Session = Depends(get_db), _=Depends(require_admin)):
     ok = delete_empresa_service(db, empresa_id)
     if not ok:
         raise HTTPException(status_code=404, detail="Empresa not found")
     return {"ok": True}
+
+
+@router.put("/{empresa_id}", response_model=EmpresaRead, operation_id="update_empresa")
+def update_empresa(empresa_id: int, empresa: EmpresaCreate, db: Session = Depends(get_db), _=Depends(require_admin)):
+    db_empresa = get_empresa_service(db, empresa_id)
+    if db_empresa is None:
+        raise HTTPException(status_code=404, detail="Empresa not found")
+    db_empresa.nome = empresa.nome
+    db_empresa.cnpj = empresa.cnpj
+    db.commit()
+    db.refresh(db_empresa)
+    return db_empresa

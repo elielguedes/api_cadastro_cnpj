@@ -1,6 +1,15 @@
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 from app.database import Base
+from sqlalchemy import Table, Column, Integer, ForeignKey
+
+# Association table for Empresa <-> Tag (N:N)
+empresa_tags = Table(
+    'empresa_tags',
+    Base.metadata,
+    Column('empresa_id', Integer, ForeignKey('empresas.id'), primary_key=True),
+    Column('tag_id', Integer, ForeignKey('tags.id'), primary_key=True)
+)
 
 class Usuario(Base):
     __tablename__ = "usuarios"
@@ -15,6 +24,7 @@ class Empresa(Base):
     nome = Column(String, index=True)
     cnpj = Column(String, index=True)
     estabelecimentos = relationship("Estabelecimento", back_populates="empresa")
+    tags = relationship("Tag", secondary=empresa_tags, back_populates="empresas")
 
 class Estabelecimento(Base):
     __tablename__ = "estabelecimentos"
@@ -30,6 +40,13 @@ class Socio(Base):
     nome = Column(String, index=True)
     estabelecimento_id = Column(Integer, ForeignKey("estabelecimentos.id"))
     estabelecimento = relationship("Estabelecimento", back_populates="socios")
+
+
+class Tag(Base):
+    __tablename__ = 'tags'
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True, index=True)
+    empresas = relationship('Empresa', secondary=empresa_tags, back_populates='tags')
 
 # Sample data
 empresa_sample = {
