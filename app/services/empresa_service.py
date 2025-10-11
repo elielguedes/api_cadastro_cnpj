@@ -18,6 +18,7 @@ Padrão utilizado: Service Layer
 
 from app.models.models import Empresa
 from app.schemas import EmpresaCreate
+from app.utils import normalize_cnpj
 
 def create_empresa_service(db, empresa: EmpresaCreate):
     """
@@ -30,7 +31,8 @@ def create_empresa_service(db, empresa: EmpresaCreate):
     Returns:
         Empresa: Objeto da empresa criada com ID gerado
     """
-    db_empresa = Empresa(nome=empresa.nome, cnpj=empresa.cnpj)
+    # normaliza o CNPJ antes de salvar
+    db_empresa = Empresa(nome=empresa.nome, cnpj=normalize_cnpj(empresa.cnpj))
     db.add(db_empresa)  # Adiciona à sessão
     db.commit()         # Persiste no banco
     db.refresh(db_empresa)  # Atualiza objeto com dados do banco (ID)

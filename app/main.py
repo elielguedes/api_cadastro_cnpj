@@ -1,5 +1,6 @@
 # Importa o FastAPI e componentes do projeto
 from fastapi import FastAPI  # Framework principal para API RESTful
+from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware  # Middleware CORS para produção
 from app.database import Base, engine  # ORM e engine do banco de dados
 from app.routers import empresas, estabelecimentos, socios, tags  # Rotas das entidades
@@ -90,30 +91,26 @@ def carregar_dados_csv():
 # A carga automática do CSV NÃO é executada no import para evitar bloqueios
 # Para ativar a importação automática ao iniciar a aplicação, defina a
 # variável de ambiente AUTO_LOAD=true. A carga será executada em background
-# durante o evento de startup do FastAPI.
-
-@app.on_event("startup")
-def startup_tasks():
-    if os.getenv("AUTO_LOAD", "false").lower() in ("1", "true", "yes"):
-        # roda em background para não bloquear o servidor
-        threading.Thread(target=carregar_dados_csv, daemon=True).start()
+# durante o lifespan de aplicação.
 
 
-@app.on_event("startup")
-def _log_startup():
-    # Log simples para diagnóstico (aparece no stdout do Uvicorn)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # startup
     try:
         print("[APP] startup event triggered")
-    except Exception:
-        pass
+        if os.getenv("AUTO_LOAD", "false").lower() in ("1", "true", "yes"):
+            threading.Thread(target=carregar_dados_csv, daemon=True).start()
+        yield
+    finally:
+        # shutdown
+        try:
+            print("[APP] shutdown event triggered")
+        except Exception:
+            pass
 
 
-@app.on_event("shutdown")
-def _log_shutdown():
-    try:
-        print("[APP] shutdown event triggered")
-    except Exception:
-        pass
+app.router.lifespan_context = lifespan
 
 class Config:
     orm_mode = True

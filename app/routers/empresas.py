@@ -85,8 +85,10 @@ def update_empresa(empresa_id: int, empresa: EmpresaCreate, db: Session = Depend
     db_empresa = get_empresa_service(db, empresa_id)
     if db_empresa is None:
         raise HTTPException(status_code=404, detail="Empresa not found")
+    # delegate normalization to service layer by assigning normalized cnpj
+    from app.utils import normalize_cnpj
     db_empresa.nome = empresa.nome
-    db_empresa.cnpj = empresa.cnpj
+    db_empresa.cnpj = normalize_cnpj(empresa.cnpj)
     db.commit()
     db.refresh(db_empresa)
     return db_empresa
