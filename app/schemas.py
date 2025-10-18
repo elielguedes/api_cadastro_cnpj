@@ -1,16 +1,7 @@
-"""Pydantic schemas used by the API.
+﻿"""Pydantic schemas used by the API."""
 
-Set configuration depending on Pydantic major version to remain compatible
-with both v1 and v2 (avoid declaring both `Config` and `model_config`).
-"""
-
-from __future__ import annotations
-
-from typing import Optional, List, Union
-import pydantic
-from pydantic import BaseModel
-
-PYDANTIC_V2 = int(pydantic.VERSION.split(".")[0]) >= 2
+from typing import List
+from pydantic import BaseModel, ConfigDict
 
 
 # ---------------------- Usuario (auth) ----------------------
@@ -25,16 +16,7 @@ class UsuarioCreate(UsuarioBase):
 
 class Usuario(UsuarioBase):
     id: int
-
-
-if PYDANTIC_V2:
-    Usuario.model_config = {"from_attributes": True}
-else:
-    class _UsuarioConfig:
-        orm_mode = True
-        from_attributes = True
-
-    Usuario.Config = _UsuarioConfig
+    model_config = ConfigDict(from_attributes=True)
 
 
 # ---------------------- Socio ----------------------
@@ -49,16 +31,7 @@ class SocioCreate(SocioBase):
 
 class Socio(SocioBase):
     id: int
-
-
-if PYDANTIC_V2:
-    Socio.model_config = {"from_attributes": True}
-else:
-    class _SocioConfig:
-        orm_mode = True
-        from_attributes = True
-
-    Socio.Config = _SocioConfig
+    model_config = ConfigDict(from_attributes=True)
 
 
 # ---------------------- Estabelecimento ----------------------
@@ -73,16 +46,7 @@ class EstabelecimentoCreate(EstabelecimentoBase):
 
 class Estabelecimento(EstabelecimentoBase):
     id: int
-
-
-if PYDANTIC_V2:
-    Estabelecimento.model_config = {"from_attributes": True}
-else:
-    class _EstabelecimentoConfig:
-        orm_mode = True
-        from_attributes = True
-
-    Estabelecimento.Config = _EstabelecimentoConfig
+    model_config = ConfigDict(from_attributes=True)
 
 
 # ---------------------- Empresa ----------------------
@@ -97,16 +61,7 @@ class EmpresaCreate(EmpresaBase):
 
 class Empresa(EmpresaBase):
     id: int
-
-
-if PYDANTIC_V2:
-    Empresa.model_config = {"from_attributes": True}
-else:
-    class _EmpresaConfig:
-        orm_mode = True
-        from_attributes = True
-
-    Empresa.Config = _EmpresaConfig
+    model_config = ConfigDict(from_attributes=True)
 
 
 # ---------------------- Tag (N:N with Empresa) ----------------------
@@ -118,29 +73,12 @@ class TagCreate(TagBase):
     pass
 
 
-if PYDANTIC_V2:
-    class Tag(TagBase):
-        id: int
-        model_config = {"from_attributes": True}
-else:
-    class Tag(TagBase):
-        id: int
-        
-        class Config:
-            orm_mode = True
-            from_attributes = True
+class Tag(TagBase):
+    id: int
+    model_config = ConfigDict(from_attributes=True)
 
 
 # ---------------------- Empresa read (with tags) ----------------------
 class EmpresaRead(Empresa):
     tags: List[Tag] = []
-
-
-if PYDANTIC_V2:
-    EmpresaRead.model_config = {"from_attributes": True}
-else:
-    class _EmpresaReadConfig:
-        orm_mode = True
-        from_attributes = True
-
-    EmpresaRead.Config = _EmpresaReadConfig
+    model_config = ConfigDict(from_attributes=True)
