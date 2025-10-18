@@ -3,7 +3,7 @@
 
 param(
     [Parameter(Mandatory=$false)]
-    [ValidateSet("up", "down", "rebuild", "logs", "status", "db-only", "basic")]
+    [ValidateSet("up", "down", "rebuild", "logs", "status", "db-only", "basic", "check", "install-wsl")]
     [string]$Action = "up"
 )
 
@@ -73,6 +73,29 @@ switch ($Action) {
     "basic" {
         Write-Host "[BASIC] Iniciando versão básica (sem health checks)..." -ForegroundColor Cyan
         docker-compose -f docker-compose.basic.yml up --build
+    }
+    "check" {
+        Write-Host "[CHECK] Verificando configuração Docker/WSL..." -ForegroundColor Magenta
+        Write-Host "=== WSL Status ===" -ForegroundColor Yellow
+        wsl --version
+        wsl --list
+        Write-Host "=== Docker Status ===" -ForegroundColor Yellow
+        docker --version
+        docker info
+        Write-Host "=== Docker Compose Test ===" -ForegroundColor Yellow
+        docker-compose config
+    }
+    "install-wsl" {
+        Write-Host "[INSTALL] Configurando WSL2 para Docker..." -ForegroundColor Green
+        Write-Host "1. Habilitando Plataforma VM..." -ForegroundColor Yellow
+        Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -All -NoRestart
+        Write-Host "2. Baixando kernel WSL2..." -ForegroundColor Yellow
+        Invoke-WebRequest -Uri "https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi" -OutFile "wsl_update_x64.msi"
+        Write-Host "3. Instalando kernel..." -ForegroundColor Yellow
+        Start-Process msiexec.exe -Wait -ArgumentList '/i wsl_update_x64.msi /quiet'
+        Write-Host "4. Configurando WSL2..." -ForegroundColor Yellow
+        wsl --set-default-version 2
+        Write-Host "[OK] WSL2 configurado! Reinicie o Docker Desktop." -ForegroundColor Green
     }
 }
 
