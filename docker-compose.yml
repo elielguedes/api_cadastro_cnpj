@@ -36,13 +36,18 @@ services:
     volumes:
       - .:/app
       - ./data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     command: >
       sh -c "
-        echo '🔄 Aguardando PostgreSQL...' &&
-        python scripts/wait_for_db.py &&
-        echo '📊 Criando/verificando tabelas...' &&
-        python -c 'from app.database import engine, Base; Base.metadata.create_all(bind=engine); print(\"✅ Tabelas OK\")' &&
-        echo '🚀 Iniciando FastAPI...' &&
+        echo '[WAIT] Aguardando PostgreSQL...' &&
+        sleep 10 &&
+        echo '[DB] Criando/verificando tabelas...' &&
+        python -c 'from app.database import engine, Base; Base.metadata.create_all(bind=engine); print(\"[OK] Tabelas OK\")' &&
+        echo '[START] Iniciando FastAPI...' &&
         uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
       "
 

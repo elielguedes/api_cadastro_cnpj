@@ -22,8 +22,11 @@
 
 #### Opção 1: PowerShell Script (Recomendado)
 ```powershell
-# Iniciar aplicação
+# Iniciar aplicação completa
 .\docker-manage.ps1 up
+
+# Iniciar apenas PostgreSQL
+.\docker-manage.ps1 db-only
 
 # Parar aplicação  
 .\docker-manage.ps1 down
@@ -77,6 +80,20 @@ python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
    netstat -ano | findstr :8000
    taskkill /PID <PID> /F
    ```
+
+## 🔧 Correções Aplicadas no docker-compose.yml
+
+### Problemas Corrigidos:
+1. **Emojis removidos** dos comandos shell (evita erros de encoding)
+2. **Script wait_for_db.py removido** (não existe, causava erro)  
+3. **Health check adicionado** para o serviço FastAPI
+4. **Sleep simples** ao invés de script complexo de espera
+5. **Arquivo docker-compose.simple.yml** criado para apenas PostgreSQL
+
+### Novas Opções:
+- `.\docker-manage.ps1 db-only` - Apenas PostgreSQL
+- Melhor compatibilidade com PowerShell
+- Logs mais limpos sem caracteres especiais
 
 4. **PostgreSQL não conecta**
    → Aguarde container "fastapi_db" estar "healthy"
