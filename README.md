@@ -1,32 +1,42 @@
-# API Cadastro CNPJ - FastAPI
+# 🏢 API Cadastro CNPJ - FastAPI
 
-## Descrição
-API RESTful para cadastro, consulta e gestão de empresas brasileiras (CNPJ), utilizando dados públicos do portal dados.gov.br. Desenvolvida com FastAPI, SQLAlchemy com suporte completo a PostgreSQL e fallback SQLite.
+[![Python](https://img.shields.io/badge/Python-3.12+-blue.svg)](https://python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.110.0-green.svg)](https://fastapi.tiangolo.com)
+[![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0+-orange.svg)](https://sqlalchemy.org)
+[![Deploy](https://img.shields.io/badge/Deploy-AWS_EC2-yellow.svg)](http://18.118.167.28:8000/docs)
+[![Status](https://img.shields.io/badge/Status-Produção-brightgreen.svg)](http://18.118.167.28:8000)
 
-## 🚀 Funcionalidades
-- ✅ CRUD completo para empresas, estabelecimentos e sócios
-- ✅ Sistema de Tags com relacionamento N:N
-- ✅ Filtros avançados, ordenação e paginação
-- ✅ Autenticação JWT com controle de permissões (admin/leitor)
-- ✅ Documentação automática interativa (Swagger/OpenAPI)
-- ✅ Validação de CNPJ integrada
-- ✅ Import/Export de dados CSV
-- ✅ Migrations com Alembic
-- ✅ Testes automatizados
-- ✅ Dockerizado com PostgreSQL
-- ✅ Deploy pronto para AWS EC2
+## 📋 Descrição
+**API RESTful completa** para cadastro, consulta e gestão de empresas brasileiras (CNPJ), utilizando **dados públicos do portal dados.gov.br**. Desenvolvida com **FastAPI**, **SQLAlchemy** e arquitetura robusta com suporte a **PostgreSQL** (produção) e **SQLite** (desenvolvimento).
+
+> 🎯 **Projeto acadêmico** para disciplina de **Técnicas de Desenvolvimento de Algoritmos**  
+> 📊 **Dados reais** do governo brasileiro via dados.gov.br  
+> 🚀 **Deploy funcional** em produção na AWS EC2
+
+## ✨ Funcionalidades Principais
+- 🔐 **Autenticação JWT** com controle de permissões (admin/leitor)
+- 📊 **CRUD completo** para empresas, estabelecimentos e sócios
+- 🏷️ **Sistema de Tags** com relacionamento N:N
+- 🔍 **Filtros avançados**, ordenação e paginação
+- 📖 **Documentação automática** interativa (Swagger/OpenAPI)
+- ✅ **Validação de CNPJ** integrada com dígitos verificadores
+- 📂 **Import/Export** de dados CSV do dados.gov.br
+- 🔄 **Migrations Alembic** para versionamento de banco
+- 🧪 **Testes automatizados** com Postman e pytest
+- 🐳 **Dockerizado** com PostgreSQL
+- ☁️ **Deploy AWS EC2** em produção funcionando
 
 ## 🏃‍♂️ Início Rápido
 
-### Local (Recomendado)
+### 💻 **Desenvolvimento Local (Recomendado)**
 ```bash
 # 1. Clone o repositório
 git clone https://github.com/elielguedes/Relatorio_Eliel_Guedes.git
 cd Relatorio_Eliel_Guedes/framework_udf
 
-# 2. Crie e ative ambiente virtual (Python 3.9+)
+# 2. Crie e ative ambiente virtual (Python 3.10+)
 python -m venv .venv
-# Windows
+# Windows PowerShell
 .\.venv\Scripts\Activate.ps1
 # Linux/Mac
 source .venv/bin/activate
@@ -34,12 +44,27 @@ source .venv/bin/activate
 # 3. Instale dependências
 pip install -r requirements.txt
 
-# 4. Inicie a aplicação
-python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+# 4. Inicie aplicação (SQLite automático)
+python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 
-# 5. Acesse a documentação
-# http://localhost:8000/docs
+# 5. OU use script otimizado
+.\.venv\Scripts\python.exe start_sqlite.py
 ```
+
+### 🚀 **Acessar Aplicação**
+
+#### 💻 **Local (Desenvolvimento)**
+- 🌐 **API**: http://127.0.0.1:8000
+- 📚 **Docs**: http://127.0.0.1:8000/docs  
+- ❤️ **Health**: http://127.0.0.1:8000/health
+
+#### ☁️ **Produção (AWS EC2)**  
+- 🌍 **API**: [http://18.118.167.28:8000](http://18.118.167.28:8000)
+- 📖 **Docs**: [http://18.118.167.28:8000/docs](http://18.118.167.28:8000/docs)
+
+#### 🔐 **Credenciais Padrão**
+- 👨‍💼 **Admin**: `admin` / `admin123`
+- 👤 **Leitor**: `leitor` / `leitor123`
 
 ### Com Docker
 
@@ -62,52 +87,139 @@ docker-compose --profile production up --build
 # Acesse: http://localhost:8000/docs
 ```
 
-## Estrutura do Projeto
-- `app/models/models.py`: Modelos ORM
-- `app/schemas.py`: Schemas Pydantic
-- `app/routers/`: Rotas da API
-- `app/services/`: Lógica de negócio
-- `app/auth.py`: Autenticação JWT
-- `data/repasse-s.csv`: Dados públicos
+## 📁 Estrutura Organizada do Projeto
 
-## Diagrama ER
+```
+📦 framework_udf/
+├── 🚀 app/                          # Código principal da aplicação
+│   ├── 🏗️  models/
+│   │   ├── __init__.py              # Documentação dos modelos
+│   │   └── models.py                # Modelos ORM SQLAlchemy
+│   ├── 🛣️  routers/                 # Endpoints da API organizados
+│   │   ├── empresas.py              # CRUD de empresas
+│   │   ├── estabelecimentos.py      # CRUD de estabelecimentos
+│   │   └── socios.py                # CRUD de sócios
+│   ├── ⚙️  services/                # Lógica de negócio (Service Layer)
+│   │   ├── __init__.py              # Documentação dos serviços
+│   │   ├── empresa_service.py       # Regras de negócio empresas
+│   │   ├── estabelecimento_service.py # Regras estabelecimentos
+│   │   └── socio_service.py         # Regras de negócio sócios
+│   ├── 🔧 utils/                    # Utilitários e helpers
+│   │   ├── __init__.py
+│   │   └── cnpj_validator.py        # Validação de CNPJ
+│   ├── 📊 schemas.py                # Schemas Pydantic (validação)
+│   ├── 🔐 auth.py                   # Autenticação JWT completa
+│   ├── 💾 database.py               # Configuração SQLAlchemy
+│   └── 🚀 main.py                   # App FastAPI principal
+├── 📂 data/                         # Dados públicos do dados.gov.br
+│   ├── repasse-s.csv                # Dataset principal (empresas)
+│   ├── Empresas.csv                 # Dados complementares
+│   └── import_rejeitados.csv        # Log de importações rejeitadas
+├── 📜 scripts/                      # Scripts utilitários
+│   ├── import_repasse.py            # Importador CSV principal
+│   ├── import_repasse_with_report.py # Import com relatório
+│   ├── export_empresas.py           # Exportador de dados
+│   └── seed_postgres.py             # Seed para PostgreSQL
+├── 🧪 tests/                        # Testes automatizados
+│   ├── test_empresas.py             # Testes CRUD empresas
+│   ├── test_estabelecimentos.py     # Testes estabelecimentos
+│   ├── test_socios.py               # Testes sócios
+│   └── test_auth.py                 # Testes autenticação
+├── 🔄 alembic/                      # Migrations de banco
+│   ├── env.py                       # Configuração Alembic
+│   └── versions/                    # Histórico de migrations
+├── 🐳 docker/                       # Containerização
+│   ├── docker-compose.yml          # Orquestração Docker
+│   ├── Dockerfile                   # Imagem da aplicação
+│   └── nginx.conf                   # Configuração proxy
+├── 📋 docs/                         # Documentação adicional
+│   ├── RELATORIO.md                 # Relatório técnico completo
+│   ├── SOLUCAO_29_ERROS_DOCKER.md   # Troubleshooting Docker
+│   ├── STATUS_FINAL_FUNCIONANDO.md  # Status do projeto
+│   └── DEPLOY_EC2_AGORA.md          # Guia de deploy AWS
+├── 🌐 deploy/                       # Scripts de deploy
+│   ├── quick-deploy.sh              # Deploy automatizado EC2
+│   ├── nginx_config                 # Config Nginx produção
+│   └── systemd_service              # Service Linux
+├── 📮 postman_collection_complete.json # Testes Postman
+├── 📦 requirements.txt              # Dependências Python
+├── ⚙️  alembic.ini                 # Config migrations
+├── 📖 README.md                     # Documentação principal
+└── 🔒 .env                         # Variáveis de ambiente
+```
+
+### 🏗️ **Arquitetura em Camadas:**
+- **🚀 Presentation Layer**: FastAPI routers (`routers/`)
+- **⚙️ Service Layer**: Lógica de negócio (`services/`)  
+- **🏗️ Data Layer**: Models SQLAlchemy (`models/`)
+- **🔐 Security Layer**: Autenticação JWT (`auth.py`)
+- **📊 Validation Layer**: Schemas Pydantic (`schemas.py`)
+
+## 📊 Diagrama ER - Modelagem de Dados
 
 ```mermaid
 erDiagram
-    USUARIO ||--o{ EMPRESA : criou
-    EMPRESA ||--o{ ESTABELECIMENTO : possui
-    ESTABELECIMENTO ||--o{ SOCIO : possui
-    EMPRESA }o--o{ TAG : rotulada_com
+    %% === ENTIDADES PRINCIPAIS ===
+    
+    USUARIO ||--o{ EMPRESA : "cria/gerencia"
+    EMPRESA ||--o{ ESTABELECIMENTO : "possui (1:N)"
+    ESTABELECIMENTO ||--o{ SOCIO : "possui (1:N)"  
+    EMPRESA }o--o{ TAG : "rotulada_com (N:N)"
 
+    %% === DEFINIÇÃO DAS TABELAS ===
+    
     USUARIO {
-        int id
-        string username
-        bool is_admin
+        int id PK "Chave primária"
+        string username UK "Login único do usuário"
+        string hashed_password "Senha criptografada (bcrypt)"
+        bool is_admin "Permissão de administrador"
+        datetime created_at "Data de criação"
     }
 
     EMPRESA {
-        int id
-        string nome
-        string cnpj
+        int id PK "Chave primária"
+        string nome "Razão social da empresa"
+        string cnpj UK "CNPJ único validado"
+        datetime created_at "Data de cadastro"
+        datetime updated_at "Última atualização"
     }
 
     ESTABELECIMENTO {
-        int id
-        string nome
-        int empresa_id
+        int id PK "Chave primária"
+        string nome "Nome do estabelecimento/filial"
+        int empresa_id FK "Referência à empresa"
+        string endereco "Endereço completo"
+        datetime created_at "Data de criação"
     }
 
     SOCIO {
-        int id
-        string nome
-        int estabelecimento_id
+        int id PK "Chave primária"
+        string nome "Nome do sócio"
+        string cpf_cnpj "CPF ou CNPJ do sócio"
+        string tipo "Pessoa física ou jurídica"
+        int estabelecimento_id FK "Referência ao estabelecimento"
+        datetime created_at "Data de cadastro"
     }
 
     TAG {
-        int id
-        string name
+        int id PK "Chave primária"
+        string name UK "Nome único da tag"
+        string description "Descrição da categoria"
+        datetime created_at "Data de criação"
+    }
+    
+    %% === TABELA DE ASSOCIAÇÃO N:N ===
+    EMPRESA_TAGS {
+        int empresa_id FK "ID da empresa"
+        int tag_id FK "ID da tag"
     }
 ```
+
+### 🔗 **Relacionamentos Detalhados:**
+- **1:N** - Uma **Empresa** pode ter múltiplos **Estabelecimentos**
+- **1:N** - Um **Estabelecimento** pode ter múltiplos **Sócios**
+- **N:N** - Uma **Empresa** pode ter múltiplas **Tags** e vice-versa
+- **1:N** - Um **Usuário** pode gerenciar múltiplas **Empresas**
 
 ## Origem dos Dados
 - Fonte: [dados.gov.br](https://dados.gov.br)
@@ -198,19 +310,87 @@ pytest -q
 
 Um teste básico (autenticação + CRUD de empresas) foi adicionado em `tests/test_auth_empresa.py`.
 
-## 🌐 Deploy AWS EC2
+## 🌐 Deploy AWS EC2 - Ambiente de Produção
 
-Esta aplicação está otimizada para deploy no Amazon EC2 com Amazon Linux 2023.
+### 🚀 URLs Funcionais em Produção
+- 🌍 **API Principal**: [http://18.118.167.28:8000](http://18.118.167.28:8000)
+- 📚 **Documentação**: [http://18.118.167.28:8000/docs](http://18.118.167.28:8000/docs)
+- ❤️ **Health Check**: [http://18.118.167.28:8000/health](http://18.118.167.28:8000/health)
+- 🔧 **OpenAPI Schema**: [http://18.118.167.28:8000/openapi.json](http://18.118.167.28:8000/openapi.json)
+
+### 🏗️ **Infraestrutura de Produção**
+```
+┌─────────────────────────────────────────┐
+│          🌐 Internet                    │
+│                 │                       │
+│    ┌─────────────▼──────────────┐       │
+│    │     AWS Security Group     │       │
+│    │   Ports: 22, 80, 8000     │       │
+│    └─────────────┬──────────────┘       │
+│                  │                      │
+│    ┌─────────────▼──────────────┐       │
+│    │      🖥️ EC2 Instance       │       │
+│    │    Ubuntu 22.04 LTS       │       │
+│    │   IP: 18.118.167.28       │       │
+│    │                           │       │
+│    │  ┌─────────────────────┐  │       │
+│    │  │   🌐 Nginx Proxy    │  │       │
+│    │  │     Port: 80       │  │       │
+│    │  └──────────┬──────────┘  │       │
+│    │             │             │       │
+│    │  ┌─────────────────────┐  │       │
+│    │  │  🚀 FastAPI App    │  │       │
+│    │  │    Port: 8000     │  │       │
+│    │  │   Uvicorn Server  │  │       │
+│    │  └──────────┬──────────┘  │       │
+│    │             │             │       │
+│    │  ┌─────────────────────┐  │       │
+│    │  │  💾 SQLite DB      │  │       │
+│    │  │   app.db           │  │       │
+│    │  └─────────────────────┘  │       │
+│    └─────────────────────────────┘       │
+└─────────────────────────────────────────┘
+```
+
+### 📊 **Status dos Serviços**
+- ✅ **FastAPI**: Rodando como systemd service
+- ✅ **Nginx**: Proxy reverso configurado
+- ✅ **SQLite**: Banco funcionando com dados carregados
+- ✅ **Firewall**: Portas 80 e 8000 liberadas
+- ✅ **SSL**: Pronto para configuração HTTPS
+- ✅ **Logs**: Monitoramento via journalctl
+
+---
+
+## 📚 Documentação Completa
+
+### 📋 **Documentos Principais**
+- 📖 **[README.md](./README.md)** - Este arquivo (visão geral)
+- 📊 **[RELATORIO.md](./RELATORIO.md)** - Relatório técnico acadêmico  
+- 🏗️ **[ARQUITETURA_SISTEMA.md](./ARQUITETURA_SISTEMA.md)** - Diagramas e design
+- 📚 **[DOCUMENTACAO_TECNICA_COMPLETA.md](./DOCUMENTACAO_TECNICA_COMPLETA.md)** - Referência técnica
+- 📋 **[INDICE_DOCUMENTACAO.md](./INDICE_DOCUMENTACAO.md)** - 🗂️ **NAVEGUE AQUI!**
+
+### 🚀 **Deploy e Status**  
+- ✅ **[STATUS_FINAL_FUNCIONANDO.md](./STATUS_FINAL_FUNCIONANDO.md)** - Status atual
+- 🌐 **[DEPLOY_EC2_AGORA.md](./DEPLOY_EC2_AGORA.md)** - Guia deploy AWS
+- 🔍 **[ENCONTRAR_EC2_INFO.md](./ENCONTRAR_EC2_INFO.md)** - Informações EC2
+
+### 🔧 **Troubleshooting**
+- 🐳 **[SOLUCAO_29_ERROS_DOCKER.md](./SOLUCAO_29_ERROS_DOCKER.md)** - Problemas Docker
+
+### 🧪 **Testes**
+- 📮 **[postman_collection_complete.json](./postman_collection_complete.json)** - Collection Postman
 
 ### Pré-requisitos EC2
 - Instância EC2 (t3.micro ou superior)
-- Security Groups: SSH(22), HTTP(80), HTTPS(443), Custom TCP(8000)
-- Amazon Linux 2023 (Python 3.9+ nativo)
+- Security Groups: SSH(22), HTTP(80), HTTPS(443), Custom TCP(8000)  
+- Ubuntu 22.04 LTS (Python 3.10+ nativo)
 
 ### Deploy Automático
 ```bash
 # 1. Conectar ao EC2
-ssh -i sua-chave.pem ec2-user@seu-ip
+ssh -i fastapi_app_key.pem ubuntu@18.118.167.28
 
 # 2. Clonar repositório
 git clone https://github.com/elielguedes/Relatorio_Eliel_Guedes.git
