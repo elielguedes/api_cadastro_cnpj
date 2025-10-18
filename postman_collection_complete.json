@@ -1,0 +1,404 @@
+{
+  "info": {
+    "name": "API Empresas FastAPI - Completa",
+    "description": "Coleção completa para testar a API de cadastro CNPJ com autenticação JWT, CRUD de empresas, estabelecimentos, sócios e sistema de tags",
+    "version": "2.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "description": "URL base da API - altere para produção se necessário"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "description": "Token JWT obtido no login - será preenchido automaticamente"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "🔐 Autenticação",
+      "item": [
+        {
+          "name": "Registrar Usuário Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\",\n  \"is_admin\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Registrar Usuário Leitor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"leitor\",\n  \"password\": \"leitor123\",\n  \"is_admin\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('token', response.access_token);",
+                  "    console.log('Token salvo:', response.access_token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/x-www-form-urlencoded"}
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "username", "value": "admin"},
+                {"key": "password", "value": "admin123"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Meu Perfil",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🏢 Empresas",
+      "item": [
+        {
+          "name": "Listar Empresas",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/empresas?skip=0&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["empresas"],
+              "query": [
+                {"key": "skip", "value": "0"},
+                {"key": "limit", "value": "10"},
+                {"key": "nome", "value": "", "disabled": true},
+                {"key": "cnpj", "value": "", "disabled": true},
+                {"key": "order_by", "value": "id", "disabled": true},
+                {"key": "order", "value": "asc", "disabled": true}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Criar Empresa",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Empresa Teste LTDA\",\n  \"cnpj\": \"11.222.333/0001-81\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/empresas",
+              "host": ["{{base_url}}"],
+              "path": ["empresas"]
+            }
+          }
+        },
+        {
+          "name": "Buscar Empresa por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/empresas/1",
+              "host": ["{{base_url}}"],
+              "path": ["empresas", "1"]
+            }
+          }
+        },
+        {
+          "name": "Atualizar Empresa",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Empresa Teste Atualizada LTDA\",\n  \"cnpj\": \"11.222.333/0001-81\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/empresas/1",
+              "host": ["{{base_url}}"],
+              "path": ["empresas", "1"]
+            }
+          }
+        },
+        {
+          "name": "Deletar Empresa",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/empresas/1",
+              "host": ["{{base_url}}"],
+              "path": ["empresas", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🏪 Estabelecimentos",
+      "item": [
+        {
+          "name": "Listar Estabelecimentos",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/estabelecimentos?skip=0&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["estabelecimentos"],
+              "query": [
+                {"key": "skip", "value": "0"},
+                {"key": "limit", "value": "10"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Criar Estabelecimento",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Filial Centro\",\n  \"empresa_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/estabelecimentos",
+              "host": ["{{base_url}}"],
+              "path": ["estabelecimentos"]
+            }
+          }
+        },
+        {
+          "name": "Buscar Estabelecimento por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/estabelecimentos/1",
+              "host": ["{{base_url}}"],
+              "path": ["estabelecimentos", "1"]
+            }
+          }
+        },
+        {
+          "name": "Deletar Estabelecimento",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/estabelecimentos/1",
+              "host": ["{{base_url}}"],
+              "path": ["estabelecimentos", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "👥 Sócios",
+      "item": [
+        {
+          "name": "Listar Sócios",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/socios?skip=0&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["socios"],
+              "query": [
+                {"key": "skip", "value": "0"},
+                {"key": "limit", "value": "10"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Criar Sócio",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"João Silva\",\n  \"estabelecimento_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/socios",
+              "host": ["{{base_url}}"],
+              "path": ["socios"]
+            }
+          }
+        },
+        {
+          "name": "Buscar Sócio por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/socios/1",
+              "host": ["{{base_url}}"],
+              "path": ["socios", "1"]
+            }
+          }
+        },
+        {
+          "name": "Deletar Sócio",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/socios/1",
+              "host": ["{{base_url}}"],
+              "path": ["socios", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🏷️ Tags",
+      "item": [
+        {
+          "name": "Listar Tags",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/tags",
+              "host": ["{{base_url}}"],
+              "path": ["tags"]
+            }
+          }
+        },
+        {
+          "name": "Criar Tag",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Tecnologia\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/tags",
+              "host": ["{{base_url}}"],
+              "path": ["tags"]
+            }
+          }
+        },
+        {
+          "name": "Associar Tag à Empresa",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/tags/1/empresas/1",
+              "host": ["{{base_url}}"],
+              "path": ["tags", "1", "empresas", "1"]
+            }
+          }
+        },
+        {
+          "name": "Remover Tag da Empresa",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/tags/1/empresas/1",
+              "host": ["{{base_url}}"],
+              "path": ["tags", "1", "empresas", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📊 Documentação",
+      "item": [
+        {
+          "name": "OpenAPI Schema",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/openapi.json",
+              "host": ["{{base_url}}"],
+              "path": ["openapi.json"]
+            }
+          }
+        },
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/",
+              "host": ["{{base_url}}"],
+              "path": [""]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

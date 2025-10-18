@@ -1,27 +1,66 @@
-# api_cadastro_cnpj
+# API Cadastro CNPJ - FastAPI
 
 ## Descrição
-API RESTful para cadastro, consulta e gestão de empresas brasileiras (CNPJ), utilizando dados públicos do portal dados.gov.br. Desenvolvida com FastAPI, SQLAlchemy e SQLite.
+API RESTful para cadastro, consulta e gestão de empresas brasileiras (CNPJ), utilizando dados públicos do portal dados.gov.br. Desenvolvida com FastAPI, SQLAlchemy com suporte completo a PostgreSQL e fallback SQLite.
 
-## Funcionalidades
-- CRUD completo para empresas, estabelecimentos e sócios
-- Filtros, ordenação e paginação
-- Autenticação JWT (admin/leitor)
-- Documentação automática (Swagger)
-- Testes automatizados (Postman)
+## 🚀 Funcionalidades
+- ✅ CRUD completo para empresas, estabelecimentos e sócios
+- ✅ Sistema de Tags com relacionamento N:N
+- ✅ Filtros avançados, ordenação e paginação
+- ✅ Autenticação JWT com controle de permissões (admin/leitor)
+- ✅ Documentação automática interativa (Swagger/OpenAPI)
+- ✅ Validação de CNPJ integrada
+- ✅ Import/Export de dados CSV
+- ✅ Migrations com Alembic
+- ✅ Testes automatizados
+- ✅ Dockerizado com PostgreSQL
+- ✅ Deploy pronto para AWS EC2
 
-## Como executar
-1. Clone o repositório
-2. Crie e ative o ambiente virtual (Python 3.12)
-3. Instale as dependências:
-   ```bash
-   pip install -r requirements.txt
-   ```
-4. Inicie o servidor:
-   ```bash
-   uvicorn app.main:app --reload
-   ```
-5. Acesse a documentação em [http://localhost:8000/docs](http://localhost:8000/docs)
+## 🏃‍♂️ Início Rápido
+
+### Local (Recomendado)
+```bash
+# 1. Clone o repositório
+git clone https://github.com/elielguedes/Relatorio_Eliel_Guedes.git
+cd Relatorio_Eliel_Guedes/framework_udf
+
+# 2. Crie e ative ambiente virtual (Python 3.9+)
+python -m venv .venv
+# Windows
+.\.venv\Scripts\Activate.ps1
+# Linux/Mac
+source .venv/bin/activate
+
+# 3. Instale dependências
+pip install -r requirements.txt
+
+# 4. Inicie a aplicação
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+# 5. Acesse a documentação
+# http://localhost:8000/docs
+```
+
+### Com Docker
+
+**Desenvolvimento:**
+```bash
+# Desenvolvimento com hot-reload
+docker-compose -f docker-compose.dev.yml up --build
+
+# Acesse: http://localhost:8001/docs
+```
+
+**Produção:**
+```bash
+# Produção com PostgreSQL
+docker-compose up --build
+
+# Com Nginx (SSL/proxy)
+docker-compose --profile production up --build
+
+# Acesse: http://localhost:8000/docs
+```
 
 ## Estrutura do Projeto
 - `app/models/models.py`: Modelos ORM
@@ -90,18 +129,23 @@ Há scripts práticos no diretório `scripts/` para trabalhar com o CSV local:
 - `scripts/import_repasse_with_report.py` — import com relatório de rejeitados em `data/import_rejeitados.csv`.
 - `scripts/export_empresas.py` — exporta as empresas atuais do DB para `data/empresas_importadas.csv`.
 
-Uso (PowerShell, no venv):
+Uso (PowerShell/Bash, no venv):
 
-```powershell
-.
+```bash
 # ativar venv
+# Windows
 .\.venv\Scripts\Activate.ps1
+# Linux/Mac  
+source .venv/bin/activate
+
 # importar (simples)
-venv\Scripts\python.exe scripts\import_repasse.py
+python scripts/import_repasse.py
+
 # importar com relatório (gera data/import_rejeitados.csv)
-venv\Scripts\python.exe scripts\import_repasse_with_report.py
+python scripts/import_repasse_with_report.py
+
 # exportar empresas
-venv\Scripts\python.exe scripts\export_empresas.py
+python scripts/export_empresas.py
 ```
 
 Opções do `import_repasse_with_report.py`:
@@ -154,14 +198,82 @@ pytest -q
 
 Um teste básico (autenticação + CRUD de empresas) foi adicionado em `tests/test_auth_empresa.py`.
 
-## Próximos passos recomendados
-- Validar e normalizar CNPJ antes de inserção
-- Criar testes adicionais e coleção Postman
-- Adicionar CI (GitHub Actions) para rodar lint e testes
-- Preparar Dockerfile e scripts para deploy na AWS (EC2/ECS/Lambda)
-- Completar cobertura de testes para as rotas de `tags` (criar, associar/desassociar, garantir que `EmpresaRead` retorna tags)
-- Consolidar migrations (autogenerate) e adicionar um script `make migrate` ou task no `Makefile`/scripts para padronizar fluxo de migrations
-- Atualizar handlers de startup para usar `lifespan` (resolver warnings depreciação do FastAPI)
+## 🌐 Deploy AWS EC2
+
+Esta aplicação está otimizada para deploy no Amazon EC2 com Amazon Linux 2023.
+
+### Pré-requisitos EC2
+- Instância EC2 (t3.micro ou superior)
+- Security Groups: SSH(22), HTTP(80), HTTPS(443), Custom TCP(8000)
+- Amazon Linux 2023 (Python 3.9+ nativo)
+
+### Deploy Automático
+```bash
+# 1. Conectar ao EC2
+ssh -i sua-chave.pem ec2-user@seu-ip
+
+# 2. Clonar repositório
+git clone https://github.com/elielguedes/Relatorio_Eliel_Guedes.git
+cd Relatorio_Eliel_Guedes/framework_udf
+
+# 3. Executar script de deploy
+chmod +x deploy/quick-deploy.sh
+./deploy/quick-deploy.sh
+
+# 4. Configurar produção (opcional)
+sudo cp deploy/nginx.conf /etc/nginx/conf.d/fastapi.conf
+sudo cp deploy/fastapi-app.service /etc/systemd/system/
+sudo systemctl enable fastapi-app
+sudo systemctl start fastapi-app
+```
+
+### Compatibilidade
+✅ **Python 3.9+** (compatível com Amazon Linux 2023)  
+✅ **SQLAlchemy 2.0** com fallback automático SQLite → PostgreSQL  
+✅ **Pydantic v2** com configuração otimizada  
+✅ **FastAPI 0.119+** com todas as features modernas  
+
+## 🧪 Testes
+
+### Testes Automatizados
+```bash
+# Instalar dependências de teste
+pip install pytest httpx
+
+# Executar todos os testes
+pytest -v
+
+# Testes com cobertura
+pytest --cov=app tests/
+```
+
+### Coleção Postman
+📋 **Coleção completa disponível**: `postman_collection_complete.json`
+
+**Inclui:**
+- ✅ Autenticação JWT (admin/leitor)
+- ✅ CRUD Empresas com filtros
+- ✅ CRUD Estabelecimentos  
+- ✅ CRUD Sócios
+- ✅ Sistema de Tags com associações
+- ✅ Variáveis de ambiente configuradas
+- ✅ Testes automatizados com scripts
+- ✅ Token management automático
+
+**Como usar:**
+1. Importe `postman_collection_complete.json` no Postman
+2. Configure variável `base_url` (padrão: `http://localhost:8000`)
+3. Execute "Login" para obter token automaticamente
+4. Todos os endpoints estarão prontos para uso
+
+## 📋 Próximos passos recomendados
+- ✅ Validação e normalização de CNPJ implementada
+- ✅ Coleção Postman atualizada
+- ✅ Deploy EC2 configurado
+- ⏳ CI/CD GitHub Actions
+- ⏳ Monitoramento e logs centralizados
+- ⏳ Cache Redis para performance
+- ⏳ Rate limiting e segurança avançada
 
 ## Autores
 - Eliel Guedes
