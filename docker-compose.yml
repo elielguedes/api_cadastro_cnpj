@@ -1,16 +1,14 @@
-﻿version: '3.8'
-
+﻿# Docker Compose para API FastAPI + PostgreSQL
 services:
-  # Banco PostgreSQL
+  # Banco de dados PostgreSQL
   db:
     image: postgres:15-alpine
-    container_name: fastapi_postgres
+    container_name: fastapi_db
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: empresas_db
-      PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -20,62 +18,33 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    networks:
-      - api_network
 
   # Aplicação FastAPI
   app:
-    build: 
-      context: .
-      dockerfile: Dockerfile
+    build: .
     container_name: fastapi_app
     restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql+psycopg2://postgres:postgres@db:5432/empresas_db
-      SECRET_KEY: ${SECRET_KEY:-dev-secret-change-me}
-      SQL_ECHO: "false"
-      AUTO_LOAD: "false"
+      - DATABASE_URL=postgresql+psycopg2://postgres:postgres@db:5432/empresas_db
+      - SECRET_KEY=docker-secret-key-change-in-production
+      - PYTHONPATH=/app
     ports:
       - "8000:8000"
     volumes:
+      - .:/app
       - ./data:/app/data
-      - ./logs:/app/logs
-    networks:
-      - api_network
     command: >
       sh -c "
-        echo 'Aguardando banco de dados...' &&
+        echo '🔄 Aguardando PostgreSQL...' &&
         python scripts/wait_for_db.py &&
-        echo 'Executando migrations...' &&
-        alembic upgrade head &&
-        echo 'Iniciando aplicação...' &&
-        uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 1
+        echo '📊 Criando/verificando tabelas...' &&
+        python -c 'from app.database import engine, Base; Base.metadata.create_all(bind=engine); print(\"✅ Tabelas OK\")' &&
+        echo '🚀 Iniciando FastAPI...' &&
+        uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
       "
-
-  # Nginx (opcional - para produção)
-  nginx:
-    image: nginx:alpine
-    container_name: fastapi_nginx
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./deploy/nginx.conf:/etc/nginx/conf.d/default.conf:ro
-    depends_on:
-      - app
-    networks:
-      - api_network
-    profiles:
-      - production
 
 volumes:
   postgres_data:
-    driver: local
-
-networks:
-  api_network:
-    driver: bridge
