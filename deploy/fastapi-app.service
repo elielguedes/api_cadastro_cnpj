@@ -1,0 +1,17 @@
+[Unit]
+Description=FastAPI Relatorio Eliel Guedes
+After=network.target
+
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/Relatorio_Eliel_Guedes
+Environment=PATH=/home/ubuntu/Relatorio_Eliel_Guedes/venv/bin
+Environment=PYTHONPATH=/home/ubuntu/Relatorio_Eliel_Guedes
+EnvironmentFile=/etc/environment
+ExecStart=/home/ubuntu/Relatorio_Eliel_Guedes/venv/bin/gunicorn app.main:app -c /home/ubuntu/Relatorio_Eliel_Guedes/gunicorn.conf.py
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

@@ -1,3 +1,34 @@
+# start.ps1
+# Helper to activate the project's virtualenv, apply migrations and run the app locally.
+# Usage (PowerShell):
+#   .\start.ps1
+
+Write-Host "== start.ps1: starting local app helper =="
+
+$venvActivate = Join-Path -Path (Resolve-Path .).Path -ChildPath ".venv\Scripts\Activate.ps1"
+if (Test-Path $venvActivate) {
+    Write-Host "Activating virtualenv: $venvActivate"
+    & $venvActivate
+} else {
+    Write-Host ".venv not found. Creating virtualenv and installing dependencies..."
+    python -m venv .venv
+    & $venvActivate
+    python -m pip install --upgrade pip
+    python -m pip install -r requirements.txt
+}
+
+# ensure imports work for local runs
+$env:PYTHONPATH = (Resolve-Path .).Path
+
+Write-Host "Applying Alembic migrations (if any)"
+try {
+    python -m alembic upgrade head
+} catch {
+    Write-Warning "Alembic upgrade failed or not configured in this environment: $_"
+}
+
+Write-Host "Starting uvicorn on http://127.0.0.1:8000 (use Ctrl+C to stop)"
+python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 <#
 Start.ps1 — script de inicialização inteligente para Windows PowerShell
 

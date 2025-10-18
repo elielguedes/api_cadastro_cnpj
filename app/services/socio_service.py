@@ -16,7 +16,8 @@ Funções disponíveis:
 - delete_socio_service: Remover sócio do sistema
 """
 
-from app.models.models import Socio
+from fastapi import HTTPException
+from app.models.models import Socio, Estabelecimento
 from app.schemas import SocioCreate
 
 def create_socio_service(db, socio: SocioCreate):
@@ -33,8 +34,13 @@ def create_socio_service(db, socio: SocioCreate):
     Note:
         O sócio deve estar vinculado a um estabelecimento existente via estabelecimento_id
     """
+    # valida se o estabelecimento referenciado existe
+    est = db.query(Estabelecimento).filter(Estabelecimento.id == socio.estabelecimento_id).first()
+    if est is None:
+        raise HTTPException(status_code=400, detail="Estabelecimento referenciado não existe")
+
     db_socio = Socio(
-        nome=socio.nome, 
+        nome=socio.nome,
         estabelecimento_id=socio.estabelecimento_id
     )
     db.add(db_socio)        # Adiciona à sessão
@@ -65,7 +71,7 @@ def get_socio_service(db, socio_id: int):
         socio_id: ID único do sócio
         
     Returns:
-        Socio | None: Objeto do sócio ou None se não encontrado
+        Socio or None: Objeto do sócio ou None se não encontrado
     """
     return db.query(Socio).filter(Socio.id == socio_id).first()
 

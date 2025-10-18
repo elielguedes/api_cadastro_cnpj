@@ -13,7 +13,7 @@ app = FastAPI(
     description="API RESTful para consulta de dados de empresas, estabelecimentos e sócios do dados.gov.br",
     version="1.0.0",
     docs_url="/docs" if os.getenv("ENVIRONMENT") != "production" else None,  # Desabilita docs em produção
-    redoc_url="/redoc" if os.getenv("ENVIRONMENT") != "production" else None  # Desabilita redoc em produção
+    redoc_url="/redoc" if os.getenv("ENVIRONMENT") != "production" else None,  # Desabilita redoc em produção
 )
 
 # Configuração CORS para produção
@@ -51,14 +51,17 @@ app.include_router(socios.router, prefix="/socios", tags=["socios"])  # Endpoint
 app.include_router(auth_router, prefix="/auth", tags=["auth"])  # Endpoints de autenticação
 app.include_router(tags.router, prefix="/tags", tags=["tags"])  # Endpoints de tags (N:N)
 
-# Cria as tabelas no banco de dados SQLite usando SQLAlchemy
-Base.metadata.create_all(bind=engine)  # Gera as tabelas conforme os modelos ORM
+# Cria as tabelas no banco de dados SQLite usando SQLAlchemy (apenas em dev local)
+try:
+    Base.metadata.create_all(bind=engine)  # Gera as tabelas conforme os modelos ORM
+except Exception as exc:
+    # Não interromper a inicialização por problemas pontuais; logamos para depuração
+    print(f"Aviso: falha ao criar tabelas automaticamente: {exc}")
 
 # Script de carga automática dos dados a partir de CSV
 import pandas as pd  # Biblioteca para manipulação de dados
 from app.models.models import Empresa, Estabelecimento, Socio  # Modelos ORM
 from sqlalchemy.orm import Session  # Sessão para transações
-import os  # Biblioteca para manipulação de arquivos
 import threading
 
 # Função para importar dados do CSV automaticamente
@@ -97,19 +100,17 @@ def carregar_dados_csv():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # startup
+    print("[APP] startup event triggered")
     try:
-        print("[APP] startup event triggered")
         if os.getenv("AUTO_LOAD", "false").lower() in ("1", "true", "yes"):
             threading.Thread(target=carregar_dados_csv, daemon=True).start()
         yield
     finally:
         # shutdown
-        try:
-            print("[APP] shutdown event triggered")
-        except Exception:
-            pass
+        print("[APP] shutdown event triggered")
 
 
+# Assign the lifespan to the router so FastAPI calls it on startup/shutdown
 app.router.lifespan_context = lifespan
 
 class Config:

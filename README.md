@@ -82,6 +82,40 @@ erDiagram
 - A carga inicial evita duplicatas por `nome`.
 - Recomenda-se validar e normalizar CNPJ (remoção de máscara) antes de inserir em produção.
 
+## Scripts de importação / exportação
+
+Há scripts práticos no diretório `scripts/` para trabalhar com o CSV local:
+
+- `scripts/import_repasse.py` — importa `data/repasse-s.csv` para o DB validando CNPJ.
+- `scripts/import_repasse_with_report.py` — import com relatório de rejeitados em `data/import_rejeitados.csv`.
+- `scripts/export_empresas.py` — exporta as empresas atuais do DB para `data/empresas_importadas.csv`.
+
+Uso (PowerShell, no venv):
+
+```powershell
+.
+# ativar venv
+.\.venv\Scripts\Activate.ps1
+# importar (simples)
+venv\Scripts\python.exe scripts\import_repasse.py
+# importar com relatório (gera data/import_rejeitados.csv)
+venv\Scripts\python.exe scripts\import_repasse_with_report.py
+# exportar empresas
+venv\Scripts\python.exe scripts\export_empresas.py
+```
+
+Opções do `import_repasse_with_report.py`:
+
+- `--dry-run` : processa o CSV e gera o relatório de rejeitados sem inserir nada no banco.
+- `--limit N` : limita o número de linhas processadas (útil para testes).
+- `--out <path>` : caminho do arquivo de relatório de rejeitados (padrão: `data/import_rejeitados.csv`).
+
+Exemplo (dry-run, 100 linhas):
+
+```powershell
+venv\Scripts\python.exe scripts\import_repasse_with_report.py --dry-run --limit 100
+```
+
 ## Migrations (Alembic)
 
 1. Instale alembic no venv:

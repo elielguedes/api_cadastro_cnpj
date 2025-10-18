@@ -14,7 +14,8 @@ def setup_module(module):
 
 
 def teardown_module(module):
-    Base.metadata.drop_all(bind=engine)
+    # teardown handled by tests/conftest.py
+    pass
 
 
 def test_create_and_update_cnpj_normalization():
@@ -28,14 +29,28 @@ def test_create_and_update_cnpj_normalization():
     token = resp.json().get('access_token')
     headers = {'Authorization': f'Bearer {token}'}
 
-    # create empresa with masked cnpj
-    resp = client.post('/empresas/', json={'nome': 'CNPJCO', 'cnpj': '00.000.000/0001-99'}, headers=headers)
+    # helper to generate valid CNPJs (same algorithm used in other tests)
+    def gen_cnpj(base12: str = "000000000001") -> str:
+        def calc(digs, mult):
+            s = sum(int(d) * m for d, m in zip(digs, mult))
+            r = s % 11
+            return "0" if r < 2 else str(11 - r)
+        first = calc(base12, [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2])
+        second = calc(base12 + first, [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2])
+        full = base12 + first + second
+        return f"{full[:2]}.{full[2:5]}.{full[5:8]}/{full[8:12]}-{full[12:]}"
+
+    # create empresa with masked (formatted) but valid cnpj
+    valid = gen_cnpj()
+    resp = client.post('/empresas/', json={'nome': 'CNPJCO', 'cnpj': valid}, headers=headers)
     assert resp.status_code == 200
     empresa = resp.json()
-    assert empresa['cnpj'] == '00000000000199'
+    # normalized stored value should be digits-only
+    assert empresa['cnpj'] == valid.replace('.', '').replace('/', '').replace('-', '')
 
-    # update empresa with different masked cnpj
+    # update empresa with another valid masked cnpj
     empresa_id = empresa['id']
-    resp = client.put(f'/empresas/{empresa_id}', json={'nome': 'CNPJCO', 'cnpj': '11.111.111/1111-11'}, headers=headers)
+    new_valid = gen_cnpj("111111111111")
+    resp = client.put(f'/empresas/{empresa_id}', json={'nome': 'CNPJCO', 'cnpj': new_valid}, headers=headers)
     assert resp.status_code == 200
-    assert resp.json()['cnpj'] == '11111111111111'
+    assert resp.json()['cnpj'] == new_valid.replace('.', '').replace('/', '').replace('-', '')

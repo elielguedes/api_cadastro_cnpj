@@ -46,12 +46,3 @@ def require_admin(current_user: Usuario = Depends(get_current_user)) -> Usuario:
     if not current_user.is_admin:
         raise HTTPException(status_code=403, detail="Apenas admin pode executar esta ação")
     return current_user
-
-
-def get_db() -> Generator:
-    """FastAPI dependency that yields a SQLAlchemy Session and ensures it's closed."""
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()

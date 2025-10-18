@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import asc, desc
-from typing import Optional
+from typing import Optional, List
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from app.auth import SECRET_KEY, ALGORITHM
@@ -24,7 +24,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 def create_empresa(empresa: EmpresaCreate, db: Session = Depends(get_db), _=Depends(require_admin)):
     return create_empresa_service(db, empresa)
 
-@router.get("/", response_model=list[EmpresaRead], operation_id="read_empresas")
+@router.get("/", response_model=List[EmpresaRead], operation_id="read_empresas")
 def read_empresas(
     skip: int = 0,
     limit: int = 10,
@@ -87,6 +87,9 @@ def update_empresa(empresa_id: int, empresa: EmpresaCreate, db: Session = Depend
         raise HTTPException(status_code=404, detail="Empresa not found")
     # delegate normalization to service layer by assigning normalized cnpj
     from app.utils import normalize_cnpj
+    from app.utils import validate_cnpj
+    if not validate_cnpj(empresa.cnpj):
+        raise HTTPException(status_code=400, detail="CNPJ inválido")
     db_empresa.nome = empresa.nome
     db_empresa.cnpj = normalize_cnpj(empresa.cnpj)
     db.commit()

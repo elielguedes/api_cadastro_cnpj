@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from typing import List
 from app.schemas import SocioCreate, Socio
 from app.deps import get_db, require_admin
 from app.services.socio_service import (
@@ -15,7 +16,7 @@ router = APIRouter()
 def create_socio(socio: SocioCreate, db: Session = Depends(get_db), _=Depends(require_admin)):
     return create_socio_service(db, socio)
 
-@router.get("/", response_model=list[Socio])
+@router.get("/", response_model=List[Socio])
 def read_socios(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     return get_socios_service(db, skip, limit)
 

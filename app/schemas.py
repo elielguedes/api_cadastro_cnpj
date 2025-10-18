@@ -6,7 +6,7 @@ with both v1 and v2 (avoid declaring both `Config` and `model_config`).
 
 from __future__ import annotations
 
-from typing import Optional
+from typing import Optional, List, Union
 import pydantic
 from pydantic import BaseModel
 
@@ -118,23 +118,22 @@ class TagCreate(TagBase):
     pass
 
 
-class Tag(TagBase):
-    id: int
-
-
 if PYDANTIC_V2:
-    Tag.model_config = {"from_attributes": True}
+    class Tag(TagBase):
+        id: int
+        model_config = {"from_attributes": True}
 else:
-    class _TagConfig:
-        orm_mode = True
-        from_attributes = True
-
-    Tag.Config = _TagConfig
+    class Tag(TagBase):
+        id: int
+        
+        class Config:
+            orm_mode = True
+            from_attributes = True
 
 
 # ---------------------- Empresa read (with tags) ----------------------
 class EmpresaRead(Empresa):
-    tags: list[Tag] = []
+    tags: List[Tag] = []
 
 
 if PYDANTIC_V2:

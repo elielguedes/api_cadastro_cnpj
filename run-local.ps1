@@ -1,4 +1,12 @@
-<#
+# run-local.ps1
+# Convenience wrapper that calls start.ps1. Kept separate for discoverability.
+
+if (-not (Test-Path .\start.ps1)) {
+    Write-Error "start.ps1 not found in project root."
+    exit 1
+}
+
+.\start.ps1<#
 run-local.ps1
 
 Cria/ativa um virtualenv, instala dependências e inicia o servidor Uvicorn

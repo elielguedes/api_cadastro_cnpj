@@ -16,7 +16,8 @@ def setup_module(module):
 
 
 def teardown_module(module):
-    Base.metadata.drop_all(bind=engine)
+    # teardown handled by tests/conftest.py
+    pass
 
 
 def test_tags_lifecycle():
@@ -31,8 +32,18 @@ def test_tags_lifecycle():
     assert token
     headers = {'Authorization': f'Bearer {token}'}
 
-    # create empresa
-    resp = client.post('/empresas/', json={'nome': 'TAGCO', 'cnpj': '22.222.222/2222-22'}, headers=headers)
+    # create empresa with a valid generated CNPJ
+    def gen_cnpj(base12: str = "222222220001") -> str:
+        def calc(digs, mult):
+            s = sum(int(d) * m for d, m in zip(digs, mult))
+            r = s % 11
+            return "0" if r < 2 else str(11 - r)
+        first = calc(base12, [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2])
+        second = calc(base12 + first, [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2])
+        full = base12 + first + second
+        return f"{full[:2]}.{full[2:5]}.{full[5:8]}/{full[8:12]}-{full[12:]}"
+
+    resp = client.post('/empresas/', json={'nome': 'TAGCO', 'cnpj': gen_cnpj()}, headers=headers)
     assert resp.status_code == 200
     empresa = resp.json()
     empresa_id = empresa['id']

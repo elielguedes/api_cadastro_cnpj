@@ -15,7 +15,8 @@
 #- delete_estabelecimento_service: Remover estabelecimento do sistema
 
 
-from app.models.models import Estabelecimento
+from fastapi import HTTPException
+from app.models.models import Estabelecimento, Empresa
 from app.schemas import EstabelecimentoCreate
 
 def create_estabelecimento_service(db, estabelecimento: EstabelecimentoCreate):
@@ -32,8 +33,13 @@ def create_estabelecimento_service(db, estabelecimento: EstabelecimentoCreate):
     Note:
         O estabelecimento deve estar vinculado a uma empresa existente via empresa_id
     """
+    # valida se a empresa referenciada existe
+    empresa = db.query(Empresa).filter(Empresa.id == estabelecimento.empresa_id).first()
+    if empresa is None:
+        raise HTTPException(status_code=400, detail="Empresa referenciada não existe")
+
     db_estabelecimento = Estabelecimento(
-        nome=estabelecimento.nome, 
+        nome=estabelecimento.nome,
         empresa_id=estabelecimento.empresa_id
     )
     db.add(db_estabelecimento)      # Adiciona à sessão
@@ -64,7 +70,7 @@ def get_estabelecimento_service(db, estabelecimento_id: int):
         estabelecimento_id: ID único do estabelecimento
         
     Returns:
-        Estabelecimento | None: Objeto do estabelecimento ou None se não encontrado
+        Estabelecimento or None: Objeto do estabelecimento ou None se não encontrado
     """
     return db.query(Estabelecimento).filter(Estabelecimento.id == estabelecimento_id).first()
 

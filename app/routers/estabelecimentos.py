@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from typing import List
 from app.schemas import EstabelecimentoCreate, Estabelecimento
 from app.deps import get_db, require_admin
 from app.services.estabelecimento_service import (
@@ -15,7 +16,7 @@ router = APIRouter()
 def create_estabelecimento(estabelecimento: EstabelecimentoCreate, db: Session = Depends(get_db), _=Depends(require_admin)):
     return create_estabelecimento_service(db, estabelecimento)
 
-@router.get("/", response_model=list[Estabelecimento])
+@router.get("/", response_model=List[Estabelecimento])
 def read_estabelecimentos(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     return get_estabelecimentos_service(db, skip, limit)
 

@@ -29,6 +29,9 @@ psycopg2-binary==2.9.10
 # Migrations
 alembic
 
+# Settings management for Pydantic v2
+pydantic-settings
+
 # Testing / http client
 pytest
 httpx==0.23.3

@@ -18,7 +18,8 @@ Padrão utilizado: Service Layer
 
 from app.models.models import Empresa
 from app.schemas import EmpresaCreate
-from app.utils import normalize_cnpj
+from fastapi import HTTPException
+from app.utils import normalize_cnpj, validate_cnpj
 
 def create_empresa_service(db, empresa: EmpresaCreate):
     """
@@ -31,7 +32,9 @@ def create_empresa_service(db, empresa: EmpresaCreate):
     Returns:
         Empresa: Objeto da empresa criada com ID gerado
     """
-    # normaliza o CNPJ antes de salvar
+    # valida e normaliza o CNPJ antes de salvar
+    if not validate_cnpj(empresa.cnpj):
+        raise HTTPException(status_code=400, detail="CNPJ inválido")
     db_empresa = Empresa(nome=empresa.nome, cnpj=normalize_cnpj(empresa.cnpj))
     db.add(db_empresa)  # Adiciona à sessão
     db.commit()         # Persiste no banco
@@ -61,7 +64,7 @@ def get_empresa_service(db, empresa_id: int):
         empresa_id: ID único da empresa
         
     Returns:
-        Empresa | None: Objeto da empresa ou None se não encontrada
+        Empresa or None: Objeto da empresa ou None se não encontrada
     """
     return db.query(Empresa).filter(Empresa.id == empresa_id).first()
 
