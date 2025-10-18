@@ -1,55 +1,26 @@
-﻿# Docker Compose para API FastAPI + PostgreSQL
-services:
-  # Banco de dados PostgreSQL
+﻿services:
   db:
-    image: postgres:15-alpine
-    container_name: fastapi_db
-    restart: unless-stopped
+    image: postgres:15
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: empresas_db
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - db_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres -d empresas_db" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
-  # Aplicação FastAPI
   app:
     build: .
-    container_name: fastapi_app
-    restart: unless-stopped
     depends_on:
-      db:
-        condition: service_healthy
+      - db
     environment:
-      - DATABASE_URL=postgresql+psycopg2://postgres:postgres@db:5432/empresas_db
-      - SECRET_KEY=docker-secret-key-change-in-production
-      - PYTHONPATH=/app
+      DATABASE_URL: postgresql+psycopg2://postgres:postgres@db:5432/empresas_db
     ports:
       - "8000:8000"
     volumes:
       - .:/app
-      - ./data:/app/data
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    command: >
-      sh -c "
-        echo '[WAIT] Aguardando PostgreSQL...' &&
-        sleep 10 &&
-        echo '[DB] Criando/verificando tabelas...' &&
-        python -c 'from app.database import engine, Base; Base.metadata.create_all(bind=engine); print(\"[OK] Tabelas OK\")' &&
-        echo '[START] Iniciando FastAPI...' &&
-        uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-      "
+    command: sh -c "sleep 15 && python -c 'from app.database import engine, Base; Base.metadata.create_all(bind=engine)' && uvicorn app.main:app --host 0.0.0.0 --port 8000"
 
 volumes:
-  postgres_data:
+  db_data:

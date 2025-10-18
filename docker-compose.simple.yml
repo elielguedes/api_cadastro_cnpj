@@ -1,5 +1,6 @@
 # Docker Compose Simplificado para Desenvolvimento
 # Use: docker-compose -f docker-compose.simple.yml up
+version: '3.8'
 
 services:
   # Apenas PostgreSQL para desenvolvimento local
@@ -14,7 +15,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_dev:/var/lib/postgresql/data
+      - db_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -22,4 +23,4 @@ services:
       retries: 3
 
 volumes:
-  postgres_dev:
+  db_data:

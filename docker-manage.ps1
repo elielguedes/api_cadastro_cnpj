@@ -3,7 +3,7 @@
 
 param(
     [Parameter(Mandatory=$false)]
-    [ValidateSet("up", "down", "rebuild", "logs", "status", "db-only")]
+    [ValidateSet("up", "down", "rebuild", "logs", "status", "db-only", "basic")]
     [string]$Action = "up"
 )
 
@@ -69,6 +69,10 @@ switch ($Action) {
     "db-only" {
         Write-Host "[DB] Iniciando apenas PostgreSQL..." -ForegroundColor Blue
         docker-compose -f docker-compose.simple.yml up -d
+    }
+    "basic" {
+        Write-Host "[BASIC] Iniciando versão básica (sem health checks)..." -ForegroundColor Cyan
+        docker-compose -f docker-compose.basic.yml up --build
     }
 }
 

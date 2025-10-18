@@ -1,0 +1,46 @@
+# Docker Compose - Versão Básica (sem health checks complexos)
+version: '3.8'
+
+services:
+  # Banco de dados PostgreSQL
+  db:
+    image: postgres:15-alpine
+    container_name: fastapi_db_basic
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: empresas_db
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  # Aplicação FastAPI
+  app:
+    build: .
+    container_name: fastapi_app_basic
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgresql+psycopg2://postgres:postgres@db:5432/empresas_db
+      - SECRET_KEY=docker-secret-key-change-in-production
+      - PYTHONPATH=/app
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+      - ./data:/app/data
+    command: >
+      sh -c "
+        echo '[WAIT] Aguardando PostgreSQL por 15 segundos...' &&
+        sleep 15 &&
+        echo '[DB] Criando/verificando tabelas...' &&
+        python -c 'from app.database import engine, Base; Base.metadata.create_all(bind=engine); print(\"[OK] Tabelas OK\")' &&
+        echo '[START] Iniciando FastAPI...' &&
+        uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+      "
+
+volumes:
+  db_data:
