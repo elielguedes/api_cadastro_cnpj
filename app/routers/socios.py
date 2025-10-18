@@ -34,14 +34,8 @@ def delete_socio(socio_id: int, db: Session = Depends(get_db), _=Depends(require
         raise HTTPException(status_code=404, detail="Sócio não encontrado")
     return {"ok": True}
 
-
+@router.put("/{socio_id}", response_model=Socio)
 @router.put("/{socio_id}", response_model=Socio)
 def update_socio(socio_id: int, socio: SocioCreate, db: Session = Depends(get_db), _=Depends(require_admin)):
-    db_socio = get_socio_service(db, socio_id)
-    if db_socio is None:
-        raise HTTPException(status_code=404, detail="Sócio não encontrado")
-    db_socio.nome = socio.nome
-    db_socio.estabelecimento_id = socio.estabelecimento_id
-    db.commit()
-    db.refresh(db_socio)
-    return db_socio
+    # TODO: Implement update_socio_service function
+    raise HTTPException(status_code=501, detail="Função não implementada")

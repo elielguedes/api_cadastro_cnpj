@@ -1,7 +1,7 @@
 """Importador CSV para data/repasse-s.csv.
 Executar usando o venv do projeto:
 
-    venv\Scripts\python.exe scripts\import_repasse.py
+    venv/Scripts/python.exe scripts/import_repasse.py
 
 O script valida CNPJ (usando app.utils.validate_cnpj), normaliza e insere
 empresas únicas no banco via SessionLocal. Exibe um resumo no final.

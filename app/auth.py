@@ -89,7 +89,7 @@ def register(user: UsuarioCreate, db: Session = Depends(get_db)):
 @router.post("/login")
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = db.query(UsuarioModel).filter(UsuarioModel.username == form_data.username).first()
-    if not user or not verify_password(form_data.password, user.hashed_password):
+    if not user or not verify_password(form_data.password, str(user.hashed_password)):
         raise HTTPException(status_code=400, detail="Usuário ou senha inválidos")
     scopes = ["admin"] if bool(user.is_admin) else ["leitor"]
     access_token = create_access_token(data={"sub": user.username, "is_admin": user.is_admin, "scopes": scopes})

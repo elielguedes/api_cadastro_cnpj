@@ -1,7 +1,7 @@
 """Exporta todas as empresas da tabela `empresas` para data/empresas_importadas.csv
 
 Executar:
-    venv\Scripts\python.exe scripts\export_empresas.py
+    venv/Scripts/python.exe scripts/export_empresas.py
 
 O script imprime o número de linhas exportadas e o caminho do arquivo.
 """

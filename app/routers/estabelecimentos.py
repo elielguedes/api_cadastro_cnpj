@@ -34,14 +34,8 @@ def delete_estabelecimento(estabelecimento_id: int, db: Session = Depends(get_db
         raise HTTPException(status_code=404, detail="Estabelecimento not found")
     return {"ok": True}
 
-
+@router.put("/{estabelecimento_id}", response_model=Estabelecimento)
 @router.put("/{estabelecimento_id}", response_model=Estabelecimento)
 def update_estabelecimento(estabelecimento_id: int, estabelecimento: EstabelecimentoCreate, db: Session = Depends(get_db), _=Depends(require_admin)):
-    db_est = get_estabelecimento_service(db, estabelecimento_id)
-    if db_est is None:
-        raise HTTPException(status_code=404, detail="Estabelecimento not found")
-    db_est.nome = estabelecimento.nome
-    db_est.empresa_id = estabelecimento.empresa_id
-    db.commit()
-    db.refresh(db_est)
-    return db_est
+    # TODO: Implement update_estabelecimento_service in the service module
+    raise HTTPException(status_code=501, detail="Update functionality not implemented")

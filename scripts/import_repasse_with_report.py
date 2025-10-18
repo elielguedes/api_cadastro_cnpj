@@ -4,7 +4,7 @@ Gera `data/import_rejeitados.csv` contendo as linhas puladas com uma coluna adic
 `motivo` (ex.: 'cnpj_invalido', 'duplicado', 'sem_nome').
 
 Executar:
-    venv\Scripts\python.exe scripts\import_repasse_with_report.py
+    venv\\Scripts\\python.exe scripts\\import_repasse_with_report.py
 """
 import os
 import sys
@@ -75,7 +75,7 @@ with SessionLocal() as db:
             elif motivo == 'duplicado':
                 skipped_duplicate += 1
             # anexa linha original + motivo
-            out = dict(row)
+            out = row.to_dict()
             out['motivo'] = motivo
             out['cnpj_normalizado'] = cnpj_norm
             rejected_rows.append(out)
@@ -91,7 +91,7 @@ with SessionLocal() as db:
             if not args.dry_run:
                 db.rollback()
             errors += 1
-            out = dict(row)
+            out = row.to_dict()
             out['motivo'] = f'erro_insercao: {e}'
             rejected_rows.append(out)
 

@@ -90,8 +90,8 @@ def update_empresa(empresa_id: int, empresa: EmpresaCreate, db: Session = Depend
     from app.utils import validate_cnpj
     if not validate_cnpj(empresa.cnpj):
         raise HTTPException(status_code=400, detail="CNPJ inválido")
-    db_empresa.nome = empresa.nome
-    db_empresa.cnpj = normalize_cnpj(empresa.cnpj)
+    setattr(db_empresa, 'nome', empresa.nome)
+    setattr(db_empresa, 'cnpj', normalize_cnpj(empresa.cnpj))
     db.commit()
     db.refresh(db_empresa)
     return db_empresa

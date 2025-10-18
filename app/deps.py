@@ -43,6 +43,6 @@ def get_current_user(token: str = Depends(oauth2_scheme), db=Depends(get_db)) ->
 
 
 def require_admin(current_user: Usuario = Depends(get_current_user)) -> Usuario:
-    if not current_user.is_admin:
+    if not getattr(current_user, 'is_admin', False):
         raise HTTPException(status_code=403, detail="Apenas admin pode executar esta ação")
     return current_user

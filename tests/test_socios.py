@@ -13,8 +13,9 @@ def get_admin_token():
     db = SessionLocal()
     from app.models.models import Usuario
     u = db.query(Usuario).filter(Usuario.username == "admin_socio").first()
-    u.is_admin = True
-    db.commit()
+    if u is not None:
+        db.query(Usuario).filter(Usuario.username == "admin_socio").update({"is_admin": True})
+        db.commit()
     db.close()
     resp = client.post("/auth/login", data={"username": "admin_socio", "password": "secret"})
     assert resp.status_code == 200
