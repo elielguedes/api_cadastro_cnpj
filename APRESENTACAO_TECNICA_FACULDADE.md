@@ -1,7 +1,7 @@
 # 🎓 APRESENTAÇÃO TÉCNICA - API CADASTRO CNPJ
 **Disciplina:** Técnicas de Desenvolvimento de Algoritmos  
 **Aluno:** Eliel Guedes  
-**Data:** 18 de Outubro de 2025
+**Data:** 19 de Outubro de 2025
 
 ---
 
@@ -13,6 +13,7 @@ Desenvolver uma **API RESTful completa** para gestão de dados empresariais bras
 ### 🏆 **Resultado Alcançado**
 ✅ **API 100% funcional** em **desenvolvimento** e **produção**  
 ✅ **Deploy AWS EC2** ativo: [http://18.118.167.28:8000/docs](http://18.118.167.28:8000/docs)  
+✅ **Link público instantâneo (ngrok)** para demonstração ao vivo (script `deploy_now/start_public.ps1`)
 ✅ **Todos os requisitos** da disciplina **superados**
 
 ---
@@ -174,10 +175,11 @@ POST /auth/login → JWT Token → Bearer Authorization
     └── 💾 SQLite Database
 ```
 
-### 📊 **URLs Funcionais (Demo Local)**
+### 📊 **URLs Funcionais (Demo Local e Público)**
 - **🌍 API Local**: [http://127.0.0.1:8000](http://127.0.0.1:8000)
 - **📚 Docs Swagger**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 - **❤️ Health Check**: [http://127.0.0.1:8000/health](http://127.0.0.1:8000/health)
+- **🔗 Público (ngrok)**: será impresso automaticamente pelo script `deploy_now/start_public.ps1` (ex.: https://xxxx.ngrok-free.dev/docs)
 
 ---
 
@@ -243,10 +245,15 @@ POST /auth/login → JWT Token → Bearer Authorization
 
 ## 🎯 13. DEMONSTRAÇÃO AO VIVO
 
-### 🚀 **URLs para Teste (Demo ao Vivo)**
-1. **📚 Documentação**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-2. **❤️ Health Check**: [http://127.0.0.1:8000/health](http://127.0.0.1:8000/health)
-3. **🏢 Listar Empresas**: [http://127.0.0.1:8000/empresas](http://127.0.0.1:8000/empresas)
+### 🚀 Passos Rápidos
+1) Executar: `./deploy_now/start_public.ps1` (Windows PowerShell)
+2) Mostrar Swagger local e público
+    - Local: http://127.0.0.1:8000/docs
+    - Público (ngrok): URL impressa no terminal (ex.: https://xxxx.ngrok-free.dev/docs)
+3) Testes ao vivo
+    - Health: /health
+    - Empresas: /empresas
+    - Autenticação (se aplicável): /auth/login
 
 ### 🔐 **Credenciais Demo**
 - **👨‍💼 Admin**: `admin` / `admin123`
