@@ -89,6 +89,14 @@
 ---
 
 #### 7. **requirements_updated.txt**
+### 🧪 **Guia de Testes e Demonstração**
+
+#### 8. **docs/POSTMAN_TEST_GUIDE.md**
+Passo a passo para testar via Postman e coleção pronta em `docs/postman_collection.json`.
+
+#### 9. **docs/DEMO_TECNICO.md**
+Roteiro de demonstração técnica completo (local, ngrok, Docker e AWS EC2/Lambda) com comandos.
+
 **Propósito**: Dependências atualizadas e documentadas  
 **Conteúdo**:
 - FastAPI core dependencies
