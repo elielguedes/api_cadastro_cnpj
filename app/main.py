@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware  # Middleware CORS para produção
 from app.database import Base, engine  # ORM e engine do banco de dados
 from app.routers import empresas, estabelecimentos, socios, tags  # Rotas das entidades
+from app.routers import lambda_routes  # Rotas de integração AWS Lambda
 from app.auth import router as auth_router  # Rotas de autenticação JWT
 import os  # Para variáveis de ambiente
 
@@ -50,6 +51,7 @@ app.include_router(estabelecimentos.router, prefix="/estabelecimentos", tags=["e
 app.include_router(socios.router, prefix="/socios", tags=["socios"])  # Endpoints de sócios
 app.include_router(auth_router, prefix="/auth", tags=["auth"])  # Endpoints de autenticação
 app.include_router(tags.router, prefix="/tags", tags=["tags"])  # Endpoints de tags (N:N)
+app.include_router(lambda_routes.router)  # Endpoints AWS Lambda integration
 
 # Cria as tabelas no banco de dados SQLite usando SQLAlchemy (apenas em dev local)
 try:

@@ -1,0 +1,11 @@
+# Requirements específicos para AWS Lambda Functions
+# Versões otimizadas para ambiente Lambda
+
+boto3>=1.28.0
+botocore>=1.31.0
+requests>=2.31.0
+urllib3>=1.26.16
+
+# Opcional (se usar em funções específicas)
+pandas>=2.0.0
+numpy>=1.24.0

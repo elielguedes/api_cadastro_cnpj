@@ -62,11 +62,18 @@ coverage.xml
 
 # OS files
 .DS_Store
-Thumbs.dbvenv/
-__pycache__/
+Thumbs.db
+
+# Redundant duplicates cleaned
+# Add generic SQLite/DB ignores
 *.db
-*.pyc
-.env
-.DS_Store
-.idea/
-.vscode/
+*.sqlite
+
+# Ngrok
+ngrok.yml
+.ngrok2/
+
+# Local data outputs
+data/*.csv
+data/*.parquet
+data/*.json

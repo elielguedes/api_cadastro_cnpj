@@ -1,0 +1,94 @@
+# 📦 Dependências do Sistema FastAPI + AWS Lambda
+# Projeto: Sistema Empresarial Híbrido  
+# Autor: Eliel Guedes
+# Data: Outubro 2025
+
+# ===== FASTAPI CORE =====
+# Framework principal para construção de APIs
+fastapi==0.110.0
+
+# Servidor ASGI para rodar a aplicação FastAPI  
+uvicorn[standard]==0.29.0
+
+# Validação de dados e serialização
+pydantic==2.6.1
+
+# Suporte a upload de arquivos
+python-multipart==0.0.6
+
+# Variáveis de ambiente
+python-dotenv==1.0.1
+
+# ===== DATABASE & ORM =====
+# ORM para manipulação de banco de dados
+sqlalchemy==2.0.23
+
+# Driver PostgreSQL (produção)
+psycopg2-binary==2.9.9
+
+# Migrations e versionamento de BD
+alembic==1.13.1
+
+# ===== AUTHENTICATION & SECURITY =====
+# Biblioteca para autenticação JWT e criptografia
+python-jose==3.3.0
+
+# Hashing de senhas com suporte ao bcrypt
+passlib[bcrypt]==1.7.4
+
+# Criptografia adicional
+cryptography==41.0.7
+
+# ===== AWS INTEGRATION (LAMBDA) =====
+# SDK oficial da AWS para Python
+boto3==1.34.144
+
+# Core do boto3 (instalado automaticamente)
+botocore==1.34.144
+
+# ===== HTTP & REQUESTS =====  
+# Biblioteca para requisições HTTP (Lambda functions)
+requests==2.31.0
+
+# Cliente HTTP para testes
+httpx==0.26.0
+
+# ===== DEVELOPMENT & TESTING =====
+# Framework de testes
+pytest==7.4.4
+
+# Suporte async para pytest
+pytest-asyncio==0.21.1
+
+# Coverage de código
+pytest-cov==4.1.0
+
+# ===== OPTIONAL ENHANCEMENTS =====
+# Logging estruturado avançado
+# structlog==23.2.0
+
+# CORS middleware (já incluído no FastAPI)
+# fastapi-cors==0.0.6
+
+# Rate limiting para produção
+# slowapi==0.1.9
+
+# ===== LAMBDA FUNCTIONS ONLY =====
+# Requirements específicos para deploy Lambda
+# (arquivo separado: lambda_functions/requirements.txt)
+# boto3==1.34.144
+# requests==2.31.0
+
+# ===== PRODUCTION EXTRAS =====
+# Para deploy com Gunicorn (alternativa ao Uvicorn)
+# gunicorn==21.2.0
+
+# Monitoring e health checks
+# prometheus-fastapi-instrumentator==6.1.0
+
+# ===== INSTALAÇÃO =====
+# pip install -r requirements.txt
+# pip install boto3  # Para AWS integration
+
+# ===== VERIFICAÇÃO =====  
+# python -c "import fastapi, sqlalchemy, boto3; print('✅ Todas dependências OK')"
