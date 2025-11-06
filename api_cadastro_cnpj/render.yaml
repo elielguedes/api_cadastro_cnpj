@@ -1,0 +1,16 @@
+# Configuração para deploy no Render
+# Deploy gratuito com 750 horas/mês
+services:
+  - type: web
+    name: fastapi-empresas
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.6
+      - key: DATABASE_URL
+        value: sqlite:///./empresas.db
+    # Free tier: 750 horas/mês, 512MB RAM, 1GB disco
+    plan: free

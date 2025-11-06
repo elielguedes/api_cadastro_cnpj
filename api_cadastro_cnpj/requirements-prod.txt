@@ -1,0 +1,8 @@
+# Adicionar gunicorn para produção
+gunicorn==21.2.0
+
+# Para logs em produção
+python-multipart==0.0.6
+
+# Para CORS se necessário
+python-cors==1.0.1

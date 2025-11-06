@@ -1,0 +1,34 @@
+# COMANDOS PARA DEPLOY NO EC2
+
+# 1. Conectar na instância (substitua pela sua chave e IP)
+ssh -i sua-chave.pem ubuntu@SEU-IP-PUBLICO
+
+# 2. Atualizar sistema
+sudo apt update && sudo apt upgrade -y
+
+# 3. Instalar Git
+sudo apt install git -y
+
+# 4. Clonar repositório
+git clone https://github.com/elielguedes/Relatorio_Eliel_Guedes.git
+cd Relatorio_Eliel_Guedes
+
+# 5. Tornar script executável
+chmod +x deploy/deploy.sh
+
+# 6. Executar deploy automático
+sudo ./deploy/deploy.sh
+
+# 7. Configurar variáveis de ambiente
+sudo nano /etc/environment
+# Adicionar:
+# SECRET_KEY="sua-chave-super-segura-de-pelo-menos-32-caracteres"
+# DATABASE_URL="sqlite:///./app.db"
+
+# 8. Verificar se está funcionando
+sudo systemctl status fastapi-app
+sudo systemctl status nginx
+
+# 9. Ver logs se houver problemas
+sudo journalctl -u fastapi-app -f
+sudo tail -f /var/log/nginx/fastapi_error.log

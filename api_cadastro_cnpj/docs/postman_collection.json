@@ -1,0 +1,79 @@
+{
+  "info": {
+    "name": "API Empresas Brasileiras - Postman",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Coleção para testar endpoints principais localmente e via ngrok"
+  },
+  "item": [
+    {
+      "name": "Health - root",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/",
+          "host": ["{{baseUrl}}"],
+          "path": [""]
+        }
+      }
+    },
+    {
+      "name": "Docs",
+      "request": {
+        "method": "GET",
+        "url": {"raw": "{{baseUrl}}/docs", "host": ["{{baseUrl}}"], "path": ["docs"]}
+      }
+    },
+    {
+      "name": "Empresas - list",
+      "request": {
+        "method": "GET",
+        "url": {"raw": "{{baseUrl}}/empresas", "host": ["{{baseUrl}}"], "path": ["empresas"]}
+      }
+    },
+    {
+      "name": "Estabelecimentos - list",
+      "request": {
+        "method": "GET",
+        "url": {"raw": "{{baseUrl}}/estabelecimentos", "host": ["{{baseUrl}}"], "path": ["estabelecimentos"]}
+      }
+    },
+    {
+      "name": "Socios - list",
+      "request": {
+        "method": "GET",
+        "url": {"raw": "{{baseUrl}}/socios", "host": ["{{baseUrl}}"], "path": ["socios"]}
+      }
+    },
+    {
+      "name": "Lambda - status",
+      "request": {
+        "method": "GET",
+        "url": {"raw": "{{baseUrl}}/lambda/functions/status", "host": ["{{baseUrl}}"], "path": ["lambda","functions","status"]}
+      }
+    },
+    {
+      "name": "Lambda - validate CNPJ",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {"mode": "raw", "raw": "{\n  \"cnpj\": \"12345678901234\"\n}"},
+        "url": {"raw": "{{baseUrl}}/lambda/validate-cnpj", "host": ["{{baseUrl}}"], "path": ["lambda","validate-cnpj"]}
+      }
+    },
+    {
+      "name": "Auth - login (opcional)",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {"mode": "raw", "raw": "{\n  \"username\": \"demo\",\n  \"password\": \"demo\"\n}"},
+        "url": {"raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth","login"]}
+      }
+    }
+  ],
+  "event": [],
+  "variable": [
+    {"key": "baseUrl", "value": "http://localhost:8000"},
+    {"key": "token", "value": ""}
+  ]
+}

@@ -1,0 +1,37 @@
+# Framework principal para construção de APIs
+fastapi==0.110.0
+
+# Servidor ASGI para rodar a aplicação FastAPI
+uvicorn[standard]==0.29.0
+
+# ORM para manipulação de banco de dados
+sqlalchemy==2.0.23
+
+# Biblioteca para autenticação JWT e criptografia
+python-jose==3.3.0
+
+# Hashing de senhas com suporte ao bcrypt
+passlib[bcrypt]==1.7.4
+
+# Manipulação e análise de dados tabulares
+pandas
+numpy
+
+# Servidor WSGI para produção
+gunicorn==21.2.0
+
+# Para upload de arquivos e forms
+python-multipart==0.0.6
+
+# Driver Postgres para SQLAlchemy
+psycopg2-binary==2.9.10
+
+# Migrations
+alembic
+
+# Settings management for Pydantic v2
+pydantic-settings
+
+# Testing / http client
+pytest
+httpx==0.23.3
