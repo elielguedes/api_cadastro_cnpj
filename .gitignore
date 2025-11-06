@@ -77,3 +77,4 @@ ngrok.yml
 data/*.csv
 data/*.parquet
 data/*.json
+api_cadastro_cnpj/.git.backup
