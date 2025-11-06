@@ -1,13 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
-from app.schemas import SocioCreate, Socio
+from app.schemas import SocioCreate, Socio, SocioUpdate
 from app.deps import get_db, require_admin
 from app.services.socio_service import (
     create_socio_service,
     get_socios_service,
     get_socio_service,
-    delete_socio_service
+    delete_socio_service,
+    update_socio_service,
 )
 
 router = APIRouter()
@@ -34,8 +35,14 @@ def delete_socio(socio_id: int, db: Session = Depends(get_db), _=Depends(require
         raise HTTPException(status_code=404, detail="Sócio não encontrado")
     return {"ok": True}
 
-@router.put("/{socio_id}", response_model=Socio)
-@router.put("/{socio_id}", response_model=Socio)
-def update_socio(socio_id: int, socio: SocioCreate, db: Session = Depends(get_db), _=Depends(require_admin)):
-    # TODO: Implement update_socio_service function
-    raise HTTPException(status_code=501, detail="Função não implementada")
+@router.put("/{socio_id}", response_model=Socio, operation_id="update_socio")
+def update_socio(
+    socio_id: int,
+    payload: SocioUpdate,
+    db: Session = Depends(get_db),
+    _=Depends(require_admin)  # Mantido consistência com as outras funções
+):
+    updated = update_socio_service(db, socio_id, payload)
+    if updated is None:
+        raise HTTPException(status_code=404, detail="Sócio não encontrado")
+    return updated

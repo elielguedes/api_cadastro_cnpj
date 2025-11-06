@@ -95,3 +95,29 @@ def delete_estabelecimento_service(db, estabelecimento_id: int):
     db.delete(estabelecimento)  # Marca para exclusão
     db.commit()                 # Confirma a exclusão
     return True
+
+
+def update_estabelecimento_service(db, estabelecimento_id: int, payload):
+    """Atualiza um estabelecimento existente (parcial).
+
+    O payload deve conter somente os campos a atualizar. Retorna o objeto atualizado ou None se não existir.
+    """
+    # import here to avoid circular import if payload type isn't strictly enforced
+    from app.models.models import Estabelecimento as EstModel
+
+    est = db.query(EstModel).filter(EstModel.id == estabelecimento_id).first()
+    if est is None:
+        return None
+
+    if hasattr(payload, "nome") and payload.nome is not None:
+        est.nome = payload.nome
+    if hasattr(payload, "empresa_id") and payload.empresa_id is not None:
+        empresa = db.query(Empresa).filter(Empresa.id == payload.empresa_id).first()
+        if empresa is None:
+            raise HTTPException(status_code=400, detail="Empresa referenciada não existe")
+        est.empresa_id = payload.empresa_id
+
+    db.add(est)
+    db.commit()
+    db.refresh(est)
+    return est

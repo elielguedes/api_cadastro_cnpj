@@ -1,24 +1,8 @@
-"""
-Serviço para operações de negócio relacionadas aos Sócios.
 
-Este módulo implementa a lógica de negócio para operações CRUD de sócios,
-que representam as pessoas físicas ou jurídicas que possuem participação nas empresas.
-
-Relacionamento: Socio pertence a um Estabelecimento (N:1)
-- Cada sócio está vinculado a um estabelecimento via estabelecimento_id
-- Um estabelecimento pode ter múltiplos sócios
-- Indiretamente, sócios estão relacionados às empresas através dos estabelecimentos
-
-Funções disponíveis:
-- create_socio_service: Criar novo sócio
-- get_socios_service: Listar sócios com paginação
-- get_socio_service: Buscar sócio específico por ID
-- delete_socio_service: Remover sócio do sistema
-"""
 
 from fastapi import HTTPException
 from app.models.models import Socio, Estabelecimento
-from app.schemas import SocioCreate
+from app.schemas import SocioCreate, SocioUpdate
 
 def create_socio_service(db, socio: SocioCreate):
     """
@@ -96,3 +80,28 @@ def delete_socio_service(db, socio_id: int):
     db.delete(socio)  # Marca para exclusão
     db.commit()       # Confirma a exclusão
     return True
+
+
+def update_socio_service(db, socio_id: int, payload: SocioUpdate):
+    """Atualiza um sócio existente com os campos fornecidos (parciais).
+
+    Retorna o objeto atualizado ou None se não existir.
+    """
+    socio = db.query(Socio).filter(Socio.id == socio_id).first()
+    if socio is None:
+        return None
+
+    # Atualiza somente os campos presentes (não-None)
+    if payload.nome is not None:
+        socio.nome = payload.nome
+    if payload.estabelecimento_id is not None:
+        # valida se o estabelecimento existe
+        est = db.query(Estabelecimento).filter(Estabelecimento.id == payload.estabelecimento_id).first()
+        if est is None:
+            raise HTTPException(status_code=400, detail="Estabelecimento referenciado não existe")
+        socio.estabelecimento_id = payload.estabelecimento_id
+
+    db.add(socio)
+    db.commit()
+    db.refresh(socio)
+    return socio

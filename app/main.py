@@ -1,26 +1,24 @@
-# Importa o FastAPI e componentes do projeto
-from fastapi import FastAPI  # Framework principal para API RESTful
-from contextlib import asynccontextmanager
-from fastapi.middleware.cors import CORSMiddleware  # Middleware CORS para produção
-from app.database import Base, engine  # ORM e engine do banco de dados
-from app.routers import empresas, estabelecimentos, socios, tags  # Rotas das entidades
-from app.routers import lambda_routes  # Rotas de integração AWS Lambda
-from app.auth import router as auth_router  # Rotas de autenticação JWT
-import os  # Para variáveis de ambiente
 
-# Inicializa a aplicação FastAPI com configurações de produção
+from fastapi import FastAPI  
+from contextlib import asynccontextmanager
+from fastapi.middleware.cors import CORSMiddleware  
+from app.database import Base, engine  
+from app.routers import empresas, estabelecimentos, socios, tags  
+from app.routers import lambda_routes  
+from app.auth import router as auth_router  
+import os  
+
 app = FastAPI(
     title="API de Empresas Brasileiras",
     description="API RESTful para consulta de dados de empresas, estabelecimentos e sócios do dados.gov.br",
     version="1.0.0",
-    docs_url="/docs" if os.getenv("ENVIRONMENT") != "production" else None,  # Desabilita docs em produção
-    redoc_url="/redoc" if os.getenv("ENVIRONMENT") != "production" else None,  # Desabilita redoc em produção
+    docs_url="/docs" if os.getenv("ENVIRONMENT") != "production" else None,  
+    redoc_url="/redoc" if os.getenv("ENVIRONMENT") != "production" else None,  
 )
 
-# Configuração CORS para produção
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Em produção, especificar domínios específicos
+    allow_origins=["*"],  
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -45,58 +43,48 @@ async def detailed_health():
         "services": ["empresas", "estabelecimentos", "socios", "auth"]
     }
 
-# Inclui as rotas das entidades principais na aplicação
-app.include_router(empresas.router, prefix="/empresas", tags=["empresas"])  # Endpoints de empresas
-app.include_router(estabelecimentos.router, prefix="/estabelecimentos", tags=["estabelecimentos"])  # Endpoints de estabelecimentos
-app.include_router(socios.router, prefix="/socios", tags=["socios"])  # Endpoints de sócios
-app.include_router(auth_router, prefix="/auth", tags=["auth"])  # Endpoints de autenticação
-app.include_router(tags.router, prefix="/tags", tags=["tags"])  # Endpoints de tags (N:N)
-app.include_router(lambda_routes.router)  # Endpoints AWS Lambda integration
 
-# Cria as tabelas no banco de dados SQLite usando SQLAlchemy (apenas em dev local)
+app.include_router(empresas.router, prefix="/empresas", tags=["empresas"])  
+app.include_router(estabelecimentos.router, prefix="/estabelecimentos", tags=["estabelecimentos"])  
+app.include_router(socios.router, prefix="/socios", tags=["socios"]) 
+app.include_router(auth_router, prefix="/auth", tags=["auth"])  
+app.include_router(tags.router, prefix="/tags", tags=["tags"])  
+app.include_router(lambda_routes.router)  
+
 try:
-    Base.metadata.create_all(bind=engine)  # Gera as tabelas conforme os modelos ORM
+    Base.metadata.create_all(bind=engine)  
 except Exception as exc:
-    # Não interromper a inicialização por problemas pontuais; logamos para depuração
     print(f"Aviso: falha ao criar tabelas automaticamente: {exc}")
 
-# Script de carga automática dos dados a partir de CSV
-import pandas as pd  # Biblioteca para manipulação de dados
-from app.models.models import Empresa, Estabelecimento, Socio  # Modelos ORM
-from sqlalchemy.orm import Session  # Sessão para transações
+
+import pandas as pd  
+from app.models.models import Empresa, Estabelecimento, Socio  
+from sqlalchemy.orm import Session  
 import threading
 
-# Função para importar dados do CSV automaticamente
-# Lê o arquivo repasse-s.csv e insere empresas no banco
-# Pode ser adaptada para importar estabelecimentos e sócios
+
 
 def carregar_dados_csv():
-    caminho_csv = os.path.join(os.path.dirname(__file__), '../data/repasse-s.csv')  # Caminho do arquivo CSV
-    if not os.path.exists(caminho_csv):  # Verifica se o arquivo existe
+    caminho_csv = os.path.join(os.path.dirname(__file__), '../data/repasse-s.csv')
+    if not os.path.exists(caminho_csv):  
         print('Arquivo CSV não encontrado:', caminho_csv)
         return
     try:
-        df = pd.read_csv(caminho_csv, sep=';')  # Lê o CSV com separador ponto e vírgula
-        with Session(engine) as session:  # Abre sessão com o banco
-            for _, row in df.iterrows():  # Itera sobre as linhas do CSV
-                # Usa as colunas corretas do CSV
-                nome_entidade = row.get('Entidade')  # Nome da entidade
-                cnpj_info = row.get('UC/CNPJ')  # CNPJ ou código
-                # Verifica se já existe no banco para evitar duplicatas
+        df = pd.read_csv(caminho_csv, sep=';')  
+        with Session(engine) as session:  
+            for _, row in df.iterrows():  
+                nome_entidade = row.get('Entidade')  
+                cnpj_info = row.get('UC/CNPJ')  
+                
                 existing = session.query(Empresa).filter_by(nome=nome_entidade).first()
                 if not existing:
-                    empresa = Empresa(nome=nome_entidade, cnpj=str(cnpj_info))  # Cria objeto Empresa
-                    session.add(empresa)  # Adiciona ao banco
-            session.commit()  # Salva todas as transações de uma vez
-        print('Carga de dados concluída.')  # Mensagem de sucesso
+                    empresa = Empresa(nome=nome_entidade, cnpj=str(cnpj_info))  
+                    session.add(empresa) 
+            session.commit()  
+        print('Carga de dados concluída.')  
     except Exception as exc:
-        # Log para depuração; não relança para evitar crash do processo principal
         print(f"Erro durante carregar_dados_csv: {exc}")
 
-# A carga automática do CSV NÃO é executada no import para evitar bloqueios
-# Para ativar a importação automática ao iniciar a aplicação, defina a
-# variável de ambiente AUTO_LOAD=true. A carga será executada em background
-# durante o lifespan de aplicação.
 
 
 @asynccontextmanager
@@ -112,7 +100,6 @@ async def lifespan(app: FastAPI):
         print("[APP] shutdown event triggered")
 
 
-# Assign the lifespan to the router so FastAPI calls it on startup/shutdown
 app.router.lifespan_context = lifespan
 
 class Config:

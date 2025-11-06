@@ -16,7 +16,18 @@ if DATABASE_URL:
 		DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
 
 	echo = os.getenv('SQL_ECHO', 'false').lower() in ('1', 'true', 'yes')
-	engine = create_engine(DATABASE_URL, echo=echo, pool_pre_ping=True)
+	# Tenta criar engine para a URL fornecida. Se a conexão inicial falhar,
+	# reverte para um SQLite local para não quebrar o ambiente de desenvolvimento.
+	try:
+		engine = create_engine(DATABASE_URL, echo=echo, pool_pre_ping=True)
+		# testa conexão imediata para detectar problemas (ex: credenciais/encoding)
+		with engine.connect() as _conn:
+			pass
+	except Exception as exc:
+		print(f"Aviso: falha ao conectar ao DATABASE_URL, revertendo para SQLite local: {exc}")
+		SQLALCHEMY_DATABASE_URL = "sqlite:///./app.db"
+		engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
+
 	SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 else:
 	# Fallback para SQLite local (prático para desenvolvimento sem Docker)

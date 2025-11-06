@@ -7,17 +7,7 @@ if (-not (Test-Path .\start.ps1)) {
 }
 
 .\start.ps1<#
-run-local.ps1
 
-Cria/ativa um virtualenv, instala dependências e inicia o servidor Uvicorn
-Uso:
-  .\run-local.ps1           # roda sem carregar CSV automaticamente
-  .\run-local.ps1 -AutoLoad # ativa AUTO_LOAD=true para carregar CSV no startup
-
-Observações:
-- Pode ser necessário permitir execução de scripts: Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-- Pressione CTRL+C para parar o servidor.
-#>
 
 param(
     [switch]$AutoLoad

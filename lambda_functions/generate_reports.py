@@ -7,7 +7,7 @@ Descrição: Gera relatórios estatísticos dos dados de empresas
 import json
 import boto3
 from datetime import datetime, timedelta
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 
 
 def generate_statistics_report(empresas_data: List[Dict]) -> Dict[str, Any]:
@@ -84,7 +84,7 @@ def generate_statistics_report(empresas_data: List[Dict]) -> Dict[str, Any]:
         }
 
 
-def send_report_notification(report_data: Dict, sns_topic_arn: str = None) -> bool:
+def send_report_notification(report_data: Dict[str, Any], sns_topic_arn: Optional[str] = None) -> bool:
     """
     Envia notificação sobre relatório gerado (via SNS)
     """
@@ -134,7 +134,7 @@ def send_report_notification(report_data: Dict, sns_topic_arn: str = None) -> bo
         return False
 
 
-def save_report_to_s3(report_data: Dict, bucket_name: str, key_prefix: str = "reports") -> Dict[str, str]:
+def save_report_to_s3(report_data: Dict[str, Any], bucket_name: str, key_prefix: str = "reports") -> Dict[str, Any]:
     """
     Salva relatório no S3
     """

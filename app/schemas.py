@@ -2,6 +2,7 @@
 
 from typing import List
 from pydantic import BaseModel, ConfigDict
+from typing import Optional
 
 
 # ---------------------- Usuario (auth) ----------------------
@@ -34,6 +35,14 @@ class Socio(SocioBase):
     model_config = ConfigDict(from_attributes=True)
 
 
+class SocioUpdate(BaseModel):
+    """Schema para atualização parcial de Sócio (campos opcionais)."""
+    nome: Optional[str] = None
+    estabelecimento_id: Optional[int] = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 # ---------------------- Estabelecimento ----------------------
 class EstabelecimentoBase(BaseModel):
     nome: str
@@ -46,6 +55,14 @@ class EstabelecimentoCreate(EstabelecimentoBase):
 
 class Estabelecimento(EstabelecimentoBase):
     id: int
+    model_config = ConfigDict(from_attributes=True)
+
+
+class EstabelecimentoUpdate(BaseModel):
+    """Schema para atualização parcial de Estabelecimento (campos opcionais)."""
+    nome: Optional[str] = None
+    empresa_id: Optional[int] = None
+
     model_config = ConfigDict(from_attributes=True)
 
 

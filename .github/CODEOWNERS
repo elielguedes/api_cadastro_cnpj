@@ -1,0 +1,3 @@
+# CODEOWNERS: require review from the repository owner for all changes
+# Format: <file pattern> <owner>
+* @elielguedes
